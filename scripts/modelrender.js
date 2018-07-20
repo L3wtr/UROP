@@ -1,60 +1,127 @@
+// Global variables
+var intHighlight = false;
+var extHighlight = false;
+
 function setup() {
   // Canvas Setup
-  var canvasWidth = 0.95 * document.getElementById('model').offsetWidth;
-  var canvasHeight = 400;
-  var canvas = createCanvas(canvasWidth, canvasHeight);
-  canvas.parent('model')
-  background(240, 240, 255)
+  canvas = {
+    width: 0.95 * document.getElementById('model').offsetWidth,
+    height: 400,
+  };
+  var model = createCanvas(canvas.width, canvas.height);
+  model.parent('model')
 
   // Shape settings
-  var bearingLoc = [canvasWidth*0.25, canvasWidth*0.75, canvasHeight*0.38, canvasHeight*0.62];
-  var shaftLoc = [canvasWidth*0.5, canvasHeight*0.5];
+  offset = {
+    top: canvas.height * 0.62,
+    bottom: canvas.height * 0.38,
+    left: canvas.width * 0.25,
+    right: canvas.width * 0.75,
+  };
+  center = {
+    horizontal: canvas.height * 0.5,
+    vertical: canvas.width * 0.5,
+  };
   rectMode(CENTER)
   ellipseMode(CENTER)
-
-  // Initial model setup
-  drawHousing(bearingLoc, shaftLoc, 12)
-  drawBearing(bearingLoc, 12)
-  drawShaft(shaftLoc, 0.9 * canvasWidth)
 }
 
 function draw() {
+  // Base schematic drawing
+  background(240, 240, 255)
+  drawBase(offset, center, 0.9 * canvas.width)
 
-}
-
-function drawHousing(housingOffset, housingCenter) {
-  // Draws 2D bearing housings
-  for (var i=0; i<=1; i++) {
-    fill(240, 240, 240)
-    rect(housingOffset[i], housingCenter[1], 60, 180)
-    fill(200, 200, 200)
-      rect(housingOffset[i], housingOffset[2] - 30, 60, 24)
-      rect(housingOffset[i], housingOffset[3] + 30, 60, 24)
-    fill(255, 255, 255)
+  // Draws highlights
+  if (intHighlight) {
+    for (let i=0; i<=3; i++) {
+      drawIntHighlight(i)
+    }
   }
-}
-
-function drawBearing(bearingCenter, ballSize) {
-  // Draws 2D bearing schematic
-  for (var i=0; i<=1; i++) {
-    for (var j=2; j<=3; j++) {
-      rect(bearingCenter[i], bearingCenter[j] - ballSize, 30, 12)
-      rect(bearingCenter[i], bearingCenter[j] + ballSize, 30, 12)
-      ellipse(bearingCenter[i], bearingCenter[j], ballSize*1.5, ballSize*1.5)
+  if (extHighlight) {
+    for (let i=0; i<=3; i++) {
+      drawExtHighlight(i)
     }
   }
 }
 
-function drawShaft(shaftCenter, shaftWidth) {
+function drawBase(offset, center, length) {
+  // Draws 2D bearing housings schematic
+  let offsetArr = [offset.left, offset.right, offset.top, offset.bottom];
+  for (let i=0; i<=1; i++) {
+    fill(240, 240, 240)
+      rect(offsetArr[i], center.horizontal, 60, 180)
+    fill(200, 200, 200)
+      rect(offsetArr[i], offset.bottom - 30, 60, 24)
+      rect(offsetArr[i], offset.top + 30, 60, 24)
+    fill(255, 255, 255)
+  }
+
+  // Draws 2D bearing schematic
+  for (let i=0; i<=1; i++) {
+    for (let j=2; j<=3; j++) {
+      rect(offsetArr[i], offsetArr[j] - 12, 30, 12)
+      rect(offsetArr[i], offsetArr[j] + 12, 30, 12)
+      ellipse(offsetArr[i], offsetArr[j], 18, 18)
+    }
+  }
+
   // Draws 2D shaft schematic
-  rect(shaftCenter[0], shaftCenter[1], shaftWidth, 60)
+  rect(center.vertical, center.horizontal, length, 60)
 
   // Draws centerline
-  var prev = 6;
-  for (var i=0; i<shaftWidth + 20; i+=20) {
-      line(prev + 4, shaftCenter[1], prev + 16, shaftCenter[1])
-      point(prev + 20, shaftCenter[1])
-      prev += 20;
+  let prev = 6;
+  for (let i=0; i<length + 20; i+=20) {
+    line(prev + 4, center.horizontal, prev + 16, center.horizontal)
+    point(prev + 20, center.horizontal)
+    prev += 20;
   }
-  line(prev + 4, shaftCenter[1], prev + 16, shaftCenter[1])
+  line(prev + 4, center.horizontal, prev + 16, center.horizontal)
+}
+
+function internalHighlight() {
+  // Internal highlight boolean
+  intHighlight = true;
+  extHighlight = false;
+}
+
+function externalHighlight() {
+  // External highlight boolean
+  extHighlight = true;
+  intHighlight = false;
+}
+
+function drawIntHighlight(pos) {
+  // Draws internal location highlights
+  let posArr = [offset.left - 15, offset.left + 15, offset.right - 15, offset.right + 15]
+  noStroke()
+  fill(255, 100, 100, 100)
+    rect(posArr[pos], center.horizontal + 31, 20, 20, 5, 5, 5, 5)
+    rect(posArr[pos], center.horizontal - 30, 20, 20, 5, 5, 5, 5)
+  stroke(0)
+}
+
+function drawExtHighlight(pos) {
+  // Draws internal location highlights
+  let posArr = [offset.left - 15, offset.left + 15, offset.right - 15, offset.right + 15]
+  noStroke()
+  fill(255, 100, 100, 100)
+    rect(posArr[pos], center.horizontal + 66, 20, 20, 5, 5, 5, 5)
+    rect(posArr[pos], center.horizontal - 65, 20, 20, 5, 5, 5, 5)
+  stroke(0)
+}
+
+function drawExtCirclip(pos) {
+  // Draws external circlip schematic at position 0 to 3
+  let posArr = [offset.left - 18, offset.left + 18, offset.right - 18, offset.right + 18]
+  fill(100, 100, 255)
+    rect(posArr[pos], center.horizontal + 30, 6, 12)
+    rect(posArr[pos], center.horizontal - 30, 6, 12)
+}
+
+function drawIntCirclip(pos) {
+  // Draws external circlip schematic at position 0 to 3
+  let posArr = [offset.left - 18, offset.left + 18, offset.right - 18, offset.right + 18]
+  fill(100, 100, 255)
+    rect(posArr[pos], center.horizontal + 65, 6, 12)
+    rect(posArr[pos], center.horizontal - 65, 6, 12)
 }
