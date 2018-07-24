@@ -22,18 +22,19 @@
   <div class="container">
     <div class="row">
       <div class="eight columns">
-          <div id="model"></div>
+          <div id="model.ID"></div>
       </div>
 
       <div class="four columns">
-          <p>Placeholder - relevant information.</p>
+          <p>Placeholder...</p>
       </div>
     </div>
   </div>
 
   <div class="container">
-    <input id="run" value="External Circlip" type="button" onclick="internalHighlight()">
-    <input id="reset" value="Internal Circlip" type="button" onclick="externalHighlight()">
+    <input id="intCirclip" value="External Circlip" type="button" onclick="feature('intCirclip')">
+    <input id="extCirclip" value="Internal Circlip" type="button" onclick="feature('extCirclip')">
+    <input id="reset" value="Reset" type="button" onclick="resetDraw()">
   </div>
 </body>
 
