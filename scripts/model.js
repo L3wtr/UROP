@@ -37,6 +37,7 @@ class Shaft {
 class Circlip {
   // Renders circlip (internal or external) based on x coordinate and position
   constructor(x, fit) {
+    let growRate = 0.005  ;
     this.x = x;
     this.fit = fit;
 
@@ -49,9 +50,17 @@ class Circlip {
     this.highlight = function() {
       stroke('red');
       fill(255, 0, 0, 20);
-        rect(x, centre.horizontal + fit, boxsize, boxsize, 5, 5, 5, 5);
-        rect(x, centre.horizontal - fit, boxsize, boxsize, 5, 5, 5, 5);
+        rect(x, centre.horizontal + fit, boxsize += growRate, boxsize += growRate, 5, 5, 5, 5);
+        rect(x, centre.horizontal - fit, boxsize += growRate, boxsize += growRate, 5, 5, 5, 5);
       stroke('black');
+
+      // Grow/shrink animation
+      if (boxsize > 24) {
+          growRate = -0.005;
+      }
+      if (boxsize < 20) {
+          growRate = 0.005;
+      }
     }
 
     this.checkOver = function() {
@@ -153,7 +162,7 @@ function resetHighlight() {
 }
 
 function feature(constraint) {
-  // Assigns constraint
+  // Assigns constraint type
   model.runHighlight = [];
   switch (constraint) {
     case 'intCirclip':
