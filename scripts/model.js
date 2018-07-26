@@ -7,10 +7,10 @@ class Housing {
 
     this.render = function() {
       fill(240, 240, 240);
-        rect(x, centre.horizontal, 60, 180);
+        rect(x, centre.horizontal, 60, 180, 2, 2, 2, 2);
       fill(200, 200, 200);
-        rect(x, offset.bottom - 30, 60, 24);
-        rect(x, offset.top + 30, 60, 24);
+        rect(x, offset.bottom - 30, 60, 24, 2, 2, 0, 0);
+        rect(x, offset.top + 30, 60, 24, 0, 0, 2, 2);
       fill('white');
 
       ballAndRace(x, offset.top);
@@ -28,7 +28,7 @@ class Shaft {
     this.rightright = rightright;
 
     this.render = function() {
-      rect(centre.vertical, centre.horizontal, centre.length, 60);
+      rect(centre.vertical, centre.horizontal, centre.length, 60, 3, 3, 3, 3);
       centreline(centre.horizontal, centre.length);
     }
   }
@@ -42,8 +42,8 @@ class Circlip {
 
     this.render = function() {
       fill(100, 100, 255);
-        rect(x, centre.horizontal + fit, 6, 12);
-        rect(x, centre.horizontal - fit, 6, 12);
+        rect(x, centre.horizontal + fit, 6, 12, 1, 1, 1, 1);
+        rect(x, centre.horizontal - fit, 6, 12, 1, 1, 1, 1);
     }
 
     this.highlight = function() {
@@ -153,7 +153,7 @@ function resetHighlight() {
 }
 
 function feature(constraint) {
-  // Assigns constraint
+  // Assigns constraint type
   model.runHighlight = [];
   switch (constraint) {
     case 'intCirclip':
@@ -196,7 +196,7 @@ function centreline(y, length) {
 
 function ballAndRace(x, y) {
   // Draws the bearing ball and race at a given x and y location
-      rect(x, y - 12, 30, 12)
-      rect(x, y + 12, 30, 12)
+      rect(x, y - 12, 30, 12, 1, 1, 1, 1)
+      rect(x, y + 12, 30, 12, 1, 1, 1, 1)
       ellipse(x, y, 18, 18)
 }
