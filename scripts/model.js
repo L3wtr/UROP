@@ -7,14 +7,13 @@ class Housing {
 
     this.render = function() {
       fill(240, 240, 240);
-        rect(x, centre.horizontal, 60, 180, 2, 2, 2, 2);
+        rect(x, centre.horizontal, 70, 160, 2, 2, 2, 2);
+        ballAndRace(x, offset.top);
+        ballAndRace(x, offset.bottom);
       fill(200, 200, 200);
-        rect(x, offset.bottom - 30, 60, 24, 2, 2, 0, 0);
-        rect(x, offset.top + 30, 60, 24, 0, 0, 2, 2);
+        rect(x, offset.top + 34, 70, 24, 2, 2, 0, 0);
+        rect(x, offset.bottom - 34, 70, 24, 0, 0, 2, 2);
       fill('white');
-
-      ballAndRace(x, offset.top);
-      ballAndRace(x, offset.bottom);
     }
   }
 }
@@ -82,25 +81,30 @@ function setup() {
   // Position coordinates
   rectMode(CENTER);
   ellipseMode(CENTER);
-  offset = {
-    top: canvas.height * 0.62,
-    bottom: canvas.height * 0.38,
-    left: canvas.width * 0.25,
-    right: canvas.width * 0.75,
-  }
   centre = {
     horizontal: canvas.height * 0.5,
     vertical: canvas.width * 0.5,
-    length: 0.9 * canvas.width,
+    length: canvas.width * 0.9,
+  }
+  offset = {
+    top: centre.horizontal + 50,
+    bottom: centre.horizontal - 51,
+    left: canvas.width * 0.25,
+    right: canvas.width * 0.75,
   }
   shift = {
-    left: -18,
-    right: +18,
+    left: -24,
+    right: 24,
     internal: 30,
-    external: 65,
+    external: 72,
   }
   boxsize = 20;
   highlightCount = 0; /* Global included to prevent highlight from resetting before completion */
+
+
+  console.log(centre);
+  console.log(offset);
+  console.log(shift);
 
   // Models initialisation
   model.housing = [
@@ -127,13 +131,14 @@ function setup() {
 }
 
 function draw() {
-  // Model render
   background(240, 240, 255)
 
+  // Display run array
   for (let i=0; i<model.run.length; i++) {
     model.run[i].render();
   }
 
+  // Display highlight array
   for (let i=0; i<model.runHighlight.length; i++){
     model.runHighlight[i].highlight();
     model.runHighlight[i].checkOver();
@@ -169,16 +174,13 @@ function mouseOver(x, fit) {
   // Returns true if mouse is over given box size
   if (mouseX > x - boxsize/2 && mouseX < x + boxsize/2 &&
       mouseY > centre.horizontal + fit - boxsize/2 && mouseY < centre.horizontal + fit + boxsize/2) {
-    console.log('Yo1')
     return true;
   }
   else if (mouseX > x - boxsize/2 && mouseX < x + boxsize/2 &&
            mouseY > centre.horizontal - fit - boxsize/2 && mouseY < centre.horizontal - fit + boxsize/2) {
-    console.log('Yo2')
     return true;
   }
   else {
-    console.log('Fail')
     return false;
   }
 }
@@ -196,7 +198,15 @@ function centreline(y, length) {
 
 function ballAndRace(x, y) {
   // Draws the bearing ball and race at a given x and y location
-      rect(x, y - 12, 30, 12, 1, 1, 1, 1)
-      rect(x, y + 12, 30, 12, 1, 1, 1, 1)
-      ellipse(x, y, 18, 18)
+  let shapeColor = ['black', 'white'];
+  let outlineSize = [2, 0];
+  
+  noStroke();
+  for (let i=0; i<=1; i++) {
+    fill(shapeColor[i]);
+    rect(x + 0.5, y - 16, 40 + outlineSize[i], 12  + outlineSize[i], 1, 1, 1, 1);
+    rect(x + 0.5, y + 16, 40 + outlineSize[i], 12 + outlineSize[i], 1, 1, 1, 1);
+    ellipse(x + 0.5, y, 24 + outlineSize[i], 24 + outlineSize[i]);
+  }
+  stroke('black');
 }
