@@ -17,10 +17,10 @@ class Constraint {
   constructor(type, location) {
     var updateRender = function() {}, 
         updatePosition = function() {};
-    var pos, rate, redRGB;
+    var pos, typeColour, rate, redRGB;
 
     this.resetHighlight = function() {
-      rate = 5; redRGB = 45;
+      rate = 5, redRGB = 45;
     }
     this.resetHighlight();
 
@@ -33,6 +33,7 @@ class Constraint {
           updatePosition = function() {
             return pos = drawCirclip(location, true);
           }
+          typeColour = 100;
         break
         case 'collar':
           updateRender = function() {
@@ -41,25 +42,29 @@ class Constraint {
           updatePosition = function() {
             return pos = drawCollar(location, true);
           }
+          typeColour = 255;
         break
         case 'shoulder':
           updateRender = function() {
             drawShoulder(location);
           }
+          typeColour = 255;
         break
         case 'spacer':
           updateRender = function() {
-            drawSpacer(location);
+            drawSpacer(false);
           }
           updatePosition = function() {
-            return pos = drawSpacer(location, true);
+            return pos = drawSpacer(true);
           }
+          typeColour = 100;
         break
       }
     }
     this.init();
 
     this.render = function() {
+      fill(typeColour, typeColour, typeColour)
       updateRender();
     }
 
@@ -111,12 +116,13 @@ function setup() {
 
   held = false;
   state = [], hover = [];
-  model.circlip = [], model.collar = [], model.spacer = [];
+  model.circlip = [], model.collar = [], model.spacer = [], model.shoulder = [];
 
   for (let i=0; i<8; i++) {
     model.circlip[i] = new Constraint('circlip', i);
     model.collar[i] = new Constraint('collar', i);
     model.spacer[i] = new Constraint('spacer', i);
+    model.shoulder[i] = new Constraint('shoulder', i);
   }
 
   model.default = [new Default()];
@@ -154,6 +160,7 @@ function resetModel() {
     model.circlip[i].resetHighlight();
     model.collar[i].resetHighlight();
     model.spacer[i].resetHighlight();
+    model.shoulder[i].resetHighlight();    
   }
 }
 
@@ -172,6 +179,9 @@ function feature(type) {
     break
     case 'spacer':
       model.runHighlight = model.spacer.slice(1,2);
+    break
+    case 'shoulder':
+      model.runHighlight = model.shoulder.slice(4,8);
     break
   }
 }
@@ -205,7 +215,7 @@ function checkHover(pos) {
 function drawBearing(x, diameter) {
   // Draws the bearing and default housing at a given x location
   let shapeColor = ['black', 'white'], outlineSize = [2, 0],
-      y = [centre.horizontal + diameter/2 + 20, centre.horizontal - diameter/2 - 19];
+      y = [centre.horizontal + diameter/2 + 21, centre.horizontal - diameter/2 - 20];
   fill(240, 240, 240);
     rect(x, centre.horizontal, 70, 160, 2, 2, 2, 2);
   noStroke();
@@ -260,10 +270,10 @@ function drawCollar(location, returnPos) {
     long = canvas.width * 0.5 - 41;
   }
   if (returnPos) {
-    return {x: x[location], shift: 0, long: long, high: shaft.diameter + 20};
+    return {x: x[location], shift: 0, long: long, high: shaft.diameter + 30};
   }
   else {
-    rect(x[location], centre.horizontal, long, shaft.diameter + 25, 1, 1, 1, 1);
+    rect(x[location], centre.horizontal, long, shaft.diameter + 30, 1, 1, 1, 1);
     drawCentreline(centre.horizontal, shaft.long);
   }
 }
@@ -273,7 +283,6 @@ function drawShaft(stepped) {
     rect(centre.vertical, centre.horizontal, shaft.long, shaft.diameter, 3, 3, 3, 3);
   }
   else {
-
   }
 }
 
@@ -290,14 +299,14 @@ function drawShoulder(x, diameter, location) {
   }
 }
 
-function drawSpacer(location, returnPos) {
+function drawSpacer(returnPos) {
   // Draws spacer at location 1 and 2
   if (returnPos) {
     return {x:centre.vertical, shift: 0, high: shaft.diameter + 25, long: canvas.width * 0.5 - 41};
   }
   else {
-    rect(centre.vertical, centre.horizontal - shaft.diameter/2 - 6.25, canvas.width * 0.5 - 41, 12.5, 1, 1, 1, 1);
-    rect(centre.vertical, centre.horizontal + shaft.diameter/2 + 6.25, canvas.width * 0.5 - 41, 12.5, 1, 1, 1, 1);
+    rect(centre.vertical, centre.horizontal - shaft.diameter/2 - 7.5, canvas.width * 0.5 - 41, 15, 1, 1, 1, 1);
+    rect(centre.vertical, centre.horizontal + shaft.diameter/2 + 7.5, canvas.width * 0.5 - 41, 15, 1, 1, 1, 1);
     drawCentreline(centre.horizontal, shaft.long);
   }
 }
