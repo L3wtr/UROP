@@ -11,6 +11,7 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js"></script>
   <script src="scripts/model.js"></script>
+  <script src="scripts/draw.js"></script>
 </head>
 
 <body>
@@ -31,10 +32,11 @@
   </div>
 
   <div class="container">
-    <input id="intCirclip" value="External Circlip" type="button" onclick="feature('intCirclip')">
-    <input id="extCirclip" value="Internal Circlip" type="button" onclick="feature('extCirclip')">
-    <input id="collar" value="Shaft Collar" type="button" onclick="feature('collar')">
+    <input id="intCirclip" value="Ext. Circlip" type="button" onclick="feature('intCirclip')">
+    <input id="extCirclip" value="Int. Circlip" type="button" onclick="feature('extCirclip')">
+    <input id="collar" value="Collar" type="button" onclick="feature('collar')">
     <input id="spacer" value="Spacer" type="button" onclick="feature('spacer')">
+    <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">    
     <input id="reset" value="Reset" type="button" onclick="resetModel()">
   </div>
 
