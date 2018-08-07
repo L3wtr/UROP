@@ -1,12 +1,16 @@
 class Default {
   // Includes functions to render the default bearing-shaft arrangement
-  constructor() {
+  constructor(type) {
     this.render = function() {
+      let diameter = shaft.diameter;
+      if (type == 'stepped') {
+        diameter = shaft.stepped;
+      }
       drawBearing(offset.left, shaft.diameter);
-      drawBearing(offset.right, shaft.diameter);
-      drawShaft('default');
-      drawHousing(offset.left, shaft.diameter, 'default');
-      drawHousing(offset.right, shaft.diameter, 'default');
+      drawBearing(offset.right, diameter);
+      drawHousing(offset.left, shaft.diameter, type);
+      drawHousing(offset.right, diameter, type);
+      drawShaft(type);
       drawCentreline(centre.horizontal, shaft.long);
     }
   }
@@ -33,7 +37,9 @@ class Constraint {
               drawCirclip(location, false);
           }
           updatePreview = function() {
-            drawCirclip(location, false);
+            if (!isStepped || location != 2) {
+              drawCirclip(location, false);
+            }
           }
           updatePosition = function() {
             return pos = drawCirclip(location, true);
@@ -50,7 +56,9 @@ class Constraint {
             }
           }
           updatePreview = function() {
-            drawCollar(location, false, false);
+            if (!isStepped) {
+              drawCollar(location, false, false);
+            }
           }
           updatePosition = function() {
             return pos = drawCollar(location, true);
@@ -75,7 +83,9 @@ class Constraint {
             state[2] = 'spacer';
           }
           updatePreview = function() {
-            drawSpacer(false);
+            if (!isStepped) {
+              drawSpacer(false);
+            }
           }
           updatePosition = function() {
             return pos = drawSpacer(true);
@@ -120,6 +130,7 @@ function setup() {
   shaft = {
     long: canvas.width * 0.9,
     diameter: 60,
+    stepped: 38,
   }
   centre = {
     horizontal: canvas.height * 0.5,
@@ -136,7 +147,7 @@ function setup() {
   rectMode(CENTER);
   ellipseMode(CENTER);
 
-  held = false;
+  held = false, isStepped = false;
   state = [], hover = [];
   model.circlip = [], model.collar = [], model.spacer = [], model.shoulder = [];
 
@@ -147,7 +158,8 @@ function setup() {
     model.shoulder[i] = new Constraint('shoulder', i);
   }
 
-  model.default = [new Default()];
+  model.default = [new Default('straight')];
+  model.shaft = [new Default('straight'), new Default('stepped')];
   resetModel();
 }
 
@@ -228,5 +240,34 @@ function resetModel() {
     model.collar[i].resetHighlight();
     model.spacer[i].resetHighlight();
     model.shoulder[i].resetHighlight();    
+  }
+}
+
+function resetPrompt() {
+  // Alert box prompting model reset
+  if (confirm("This will reset your model. Do you wish to continue?")) {
+    resetModel();
+  }
+}
+
+function toggleShaft() {
+  // Switches shaft type (straight or stepped)
+  let shaftCheckbox = document.getElementById("shaft");
+  if (shaftCheckbox.checked) {
+    resetPrompt();
+    model.run.splice(0, 1, model.shaft[1]);
+    state[0] = state[2] = 'collar';
+    model.run = model.run.concat(model.collar[0]);
+
+    isStepped = true;
+    model.circlip.init();
+    model.collar.init();
+    model.spacer.init();
+  }
+  else {
+    resetPrompt();
+    model.run.splice(0, 1, model.shaft[0]);
+    
+    isStepped = false;
   }
 }

@@ -37,8 +37,12 @@ function drawCirclip(location, returnPos) {
   let x = [offset.left - 24, offset.left + 24, offset.right - 24, offset.right + 24],
       shift = 30;
 
+  if (isStepped && (location == 3 || location > 5)) {
+    shift -= (shaft.diameter - shaft.stepped)/2;  
+  }
+
   if (location > 3) {
-    shift = 72;
+    shift += 42;
     location -= 4;
   }
 
@@ -73,7 +77,8 @@ function drawCollar(location, returnPos, merge) {
 
 function drawHousing(x, diameter, location) {
   // Draws bearing housing and shoulder at x for a given shaft diameter
-  let shift = offset.left;
+  let shift = offset.left,
+      step = 0;
 
   if (typeof location == 'string') {
     fill(200, 200, 200);
@@ -84,33 +89,39 @@ function drawHousing(x, diameter, location) {
   else {
     if (location > 5) {
       shift = offset.right;
+      if (isStepped) {
+        step = -(shaft.diameter - shaft.stepped)/2;
+      }
     }
     for (i=-1; i<2; i+=2) {
       beginShape();
-        vertex(shift + 35.5, centre.horizontal + i * shaft.diameter/2 + i * (42 + i * 0.5));
-        vertex(shift + 35.5, centre.horizontal + i * shaft.diameter/2 + i * (66 + i * 0.5));
-        vertex(shift - 34.5, centre.horizontal + i * shaft.diameter/2 + i * (66 + i * 0.5));
-        vertex(shift - 34.5, centre.horizontal + i * shaft.diameter/2 + i * (42 + i * 0.5));
+        vertex(shift + 35.5, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
+        vertex(shift + 35.5, centre.horizontal + i*shaft.diameter/2 + i*(66 + i*0.5) + i*step);
+        vertex(shift - 34.5, centre.horizontal + i*shaft.diameter/2 + i*(66 + i*0.5) + i*step);
+        vertex(shift - 34.5, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
         if (state[4] == 'shoulder' || state[6] == 'shoulder') {
-          vertex(shift - 34.5, centre.horizontal + i * shaft.diameter/2 + i * (30 + i * 0.5));
-          vertex(shift - 20, centre.horizontal + i * shaft.diameter/2 + i * (30 + i * 0.5));
-          vertex(shift - 20, centre.horizontal + i * shaft.diameter/2 + i * (42 + i * 0.5));
+          vertex(shift - 34.5, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
+          vertex(shift - 20, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
+          vertex(shift - 20, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
         } 
         if (state[5] == 'shoulder' || state[7] == 'shoulder') {
-          vertex(shift + 21, centre.horizontal + i * shaft.diameter/2 + i * (42 + i * 0.5));
-          vertex(shift + 21, centre.horizontal + i * shaft.diameter/2 + i * (30 + i * 0.5));
-          vertex(shift + 35.5, centre.horizontal + i * shaft.diameter/2 + i * (30 + i * 0.5));
+          vertex(shift + 21, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
+          vertex(shift + 21, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
+          vertex(shift + 35.5, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
         }
       endShape(CLOSE);
     }
   }
 }
 
-function drawShaft(stepped) {
-  if (stepped == 'default') {
+function drawShaft(type) {
+  // Draws a given shaft (straight or stepped)
+  if (type == 'straight') {
     rect(centre.vertical, centre.horizontal, shaft.long, shaft.diameter, 3, 3, 3, 3);
   }
   else {
+    rect(centre.vertical, centre.horizontal, shaft.long, shaft.stepped, 3, 3, 3, 3);
+    rect(centre.vertical - canvas.width * 0.1 - 10.5, centre.horizontal, canvas.width * 0.7 - 20.5, shaft.diameter, 3, 3, 3, 3);
   }
 }
 
@@ -119,6 +130,10 @@ function drawShoulder(location, returnPos) {
   let x = [offset.left - 27.5, offset.left + 27.5, offset.right - 27.5, offset.right + 27.5],
       shift = 66;
   location -= 4;
+
+  if (isStepped && location > 1) {
+    shift -= (shaft.diameter - shaft.stepped)/2;
+  }
 
   if (returnPos) {
     return {x: x[location], shift: shift, long: 14, high: 12};

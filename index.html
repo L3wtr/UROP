@@ -10,8 +10,8 @@
   <link rel="stylesheet" href="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/style.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js"></script>
-  <script src="scripts/model.js"></script>
   <script src="scripts/draw.js"></script>
+  <script src="scripts/model.js"></script>
 </head>
 
 <body>
@@ -32,12 +32,24 @@
   </div>
 
   <div class="container">
-    <input id="intCirclip" value="Ext. Circlip" type="button" onclick="feature('intCirclip')">
-    <input id="extCirclip" value="Int. Circlip" type="button" onclick="feature('extCirclip')">
-    <input id="collar" value="Collar" type="button" onclick="feature('collar')">
-    <input id="spacer" value="Spacer" type="button" onclick="feature('spacer')">
-    <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">    
-    <input id="reset" value="Reset" type="button" onclick="resetModel()">
+    <div class="row">
+      <div class="five columns">
+        <h5>Internal Constraints</h5>
+          <input id="extCirclip" value="External Circlip" type="button" onclick="feature('intCirclip')">
+          <input id="collar" value="Collar" type="button" onclick="feature('collar')">
+          <input id="spacer" value="Spacer" type="button" onclick="feature('spacer')">
+        <h5>External Constraints</h5>
+          <input id="intCirclip" value="Internal Circlip" type="button" onclick="feature('extCirclip')">
+          <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">
+      </div>
+
+      <div class="three columns">
+        <h5>Options</h5> 
+          Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="toggleShaft()">  <br>
+          Design/Drag Mode Toggle <input id="mode" type="checkbox"><br>
+          <input id="reset" value="Reset" type="button" onclick="resetPrompt()">
+      </div>
+    </div>
   </div>
 
   <script src="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/navigator.js"></script>  
