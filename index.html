@@ -6,18 +6,23 @@
   <title>Bearing Constraints Model</title>
   <link rel="icon" href="https://www.imperial.ac.uk/T4Assets/favicon-196x196.png" type="image/x-icon">
 
+  <!-- CSS -->
   <link rel="stylesheet" href="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/skeleton.css">
   <link rel="stylesheet" href="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/style.css">
-  
+  <link rel="stylesheet" href="styles/test.css">
+
+  <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  
+  <!-- Local Scripts -->
   <script src="scripts/draw.js"></script>
   <script src="scripts/model.js"></script>
 </head>
 
 <body>
-  <div class="container">
-    <h1>Bearing Constraints Model</h1>
-  </div>
+
+  <div> <br> <br> <br> <br> </div> <!-- ### Temporary until CSS fix ### -->
 
   <div class="container">
     <div class="row">
@@ -45,9 +50,9 @@
 
       <div class="three columns">
         <h5>Options</h5> 
-          Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="toggleShaft()">  <br>
+          Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="reset()"><br>
           Design/Drag Mode Toggle <input id="mode" type="checkbox"><br>
-          <input id="reset" value="Reset" type="button" onclick="resetPrompt()">
+          <input id="reset" value="Reset" type="button" onclick="reset()">
       </div>
     </div>
   </div>

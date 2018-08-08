@@ -165,7 +165,7 @@ function setup() {
 
   model.default = [new Default('straight')];
   model.shaft = [new Default('straight'), new Default('stepped')];
-  resetModel();
+  initialise();
 }
 
 function draw() {
@@ -235,7 +235,7 @@ function highlightConstraint(colour, preview) {
   return colour;
 }
 
-function resetModel() {
+function initialise() {
   // Reset model render
   model.run = model.default;
   model.runHighlight = [];
@@ -251,12 +251,12 @@ function resetModel() {
 function resetPrompt() {
   // Alert box prompting model reset
   if (confirm("This will reset your model. Do you wish to continue?")) {
-    resetModel();
+    initialise();
   }
 }
 
-function toggleShaft() {
-  // Switches shaft type (straight or stepped)
+function reset() {
+  // Resets shaft type (straight or stepped)
   let shaftCheckbox = document.getElementById("shaft");
   if (shaftCheckbox.checked) {
     resetPrompt();
@@ -264,6 +264,7 @@ function toggleShaft() {
     state[0] = state[2] = 'collar';
     model.run = model.run.concat(model.collar[0]);
 
+    // Re-initialise internal constraints for stepped case
     isStepped = true;
     model.circlip.init();
     model.collar.init();
