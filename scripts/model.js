@@ -108,7 +108,12 @@ class Constraint {
         [redRGB, rate] = highlightConstraint([redRGB, rate], updatePreview);
         if (held) {
           if (checkHover(updatePosition())) {
-            model.run = model.run.concat(this);
+            if (type == 'shoulder') { // Fixes bug where shoulders are rendered above circlips
+              model.run.splice(1, 0, this)
+            }
+            else {
+              model.run = model.run.concat(this);
+            }
             state[location] = type;
           }
         }

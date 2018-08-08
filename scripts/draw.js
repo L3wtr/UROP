@@ -78,6 +78,7 @@ function drawCollar(location, returnPos, merge) {
 function drawHousing(x, diameter, location) {
   // Draws bearing housing and shoulder at x for a given shaft diameter
   let shift = offset.left,
+      stateIndex = 4,
       step = 0;
 
   if (typeof location == 'string') {
@@ -89,6 +90,7 @@ function drawHousing(x, diameter, location) {
   else {
     if (location > 5) {
       shift = offset.right;
+      stateIndex += 2;
       if (isStepped) {
         step = -(shaft.diameter - shaft.stepped)/2;
       }
@@ -99,12 +101,12 @@ function drawHousing(x, diameter, location) {
         vertex(shift + 35.5, centre.horizontal + i*shaft.diameter/2 + i*(66 + i*0.5) + i*step);
         vertex(shift - 34.5, centre.horizontal + i*shaft.diameter/2 + i*(66 + i*0.5) + i*step);
         vertex(shift - 34.5, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
-        if (state[4] == 'shoulder' || state[6] == 'shoulder') {
+        if (state[stateIndex] == 'shoulder') {
           vertex(shift - 34.5, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
           vertex(shift - 20, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
           vertex(shift - 20, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
-        } 
-        if (state[5] == 'shoulder' || state[7] == 'shoulder') {
+        }
+        if (state[stateIndex + 1] == 'shoulder') {
           vertex(shift + 21, centre.horizontal + i*shaft.diameter/2 + i*(42 + i*0.5) + i*step);
           vertex(shift + 21, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
           vertex(shift + 35.5, centre.horizontal + i*shaft.diameter/2 + i*(30 + i*0.5) + i*step);
