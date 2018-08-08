@@ -47,7 +47,7 @@ function drawCirclip(location, returnPos) {
   }
 
   if (returnPos) {
-    return {x: x[location], shift: shift, long: 6, high: 12};
+    return {x: x[location], shift: shift, high: 12, long: 6};
   }
   else {
     rect(x[location], centre.horizontal + shift, 6, 12, 1, 1, 1, 1);
@@ -67,7 +67,7 @@ function drawCollar(location, returnPos, merge) {
   }
 
   if (returnPos) {
-    return {x: x[location], shift: 0, long: long, high: shaft.diameter + 22};
+    return {x: x[location], shift: 0, high: shaft.diameter + 22, long: long};
   }
   else {
     rect(x[location], centre.horizontal, long, shaft.diameter + 22, 2, 2, 2, 2);
@@ -138,7 +138,7 @@ function drawShoulder(location, returnPos) {
   }
 
   if (returnPos) {
-    return {x: x[location], shift: shift, long: 14, high: 12};
+    return {x: x[location], shift: shift, high: 12, long: 14};
   }
   else {
     rect(x[location], centre.horizontal + shift, 14, 12);

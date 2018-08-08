@@ -18,6 +18,7 @@
   <!-- Local Scripts -->
   <script src="scripts/draw.js"></script>
   <script src="scripts/model.js"></script>
+  <script src="scripts/table.js"></script>
 </head>
 
 <body>
@@ -31,7 +32,26 @@
       </div>
 
       <div class="four columns">
-        <p>Placeholder...</p>
+        <table>
+          <tr>
+            <td></td>
+            <th>Internal Constraints</th>
+            <th>External Constraints</th>
+            <th>Condition</td>
+          </tr>
+          <tr>
+            <th> Left Bearing </th>
+            <td id="leftInt"></td>
+            <td id="leftExt"></td>
+            <td id="leftCond"></td>
+          </tr>
+          <tr>
+            <th> Right Bearing </th>
+            <td id="rightInt"></td>
+            <td id="rightExt"></td>
+            <td id="rightCond"></td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
@@ -51,7 +71,8 @@
       <div class="three columns">
         <h5>Options</h5> 
           Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="reset()"><br>
-          Design/Drag Mode Toggle <input id="mode" type="checkbox"><br>
+          Design/Drag Mode Toggle <input id="mode" type="checkbox" onclick="mode()"><br>
+          Sketch/Drawing Mode Toggle <input id="drawing" type="checkbox"><br>
           <input id="reset" value="Reset" type="button" onclick="reset()">
       </div>
     </div>
@@ -61,3 +82,6 @@
 </body>
 
 </html>
+
+<!-- ### VC-integrate ###-->
+<!-- initGuidance in js file-->

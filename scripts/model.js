@@ -19,10 +19,10 @@ class Default {
 class Constraint {
   // Includes functions to render all constraint types at each location
   constructor(type, location) {
-    var updateRender = function() {}, 
+    let updateRender = function() {}, 
         updatePosition = function() {},
         updatePreview = function() {};
-    var pos, rate, redRGB;
+    let pos, rate, redRGB;
 
     this.resetHighlight = function() {
       rate = 5, redRGB = 45;
@@ -81,6 +81,7 @@ class Constraint {
             fill(100, 100, 100)
               drawSpacer(false);
             state[2] = 'spacer';
+            updateBearingTable();
           }
           updatePreview = function() {
             if (!isStepped) {
@@ -115,9 +116,41 @@ class Constraint {
               model.run = model.run.concat(this);
             }
             state[location] = type;
+            updateBearingTable();
           }
         }
       }
+    }
+  }
+}
+
+class Drag {
+  // Includes functions to allow dragging of shaft and bearings
+  constructor(type) {
+    let area;
+    this.init = function() {
+      switch(type) {
+        case 'shaft':
+          area = {x: centre.vertical, shift: 0, high: shaft.diameter, long: shaft.long};
+        break
+        case 'left':
+          area = {x: centre.vertical, shift: 0, high: shaft.diameter, long: shaft.long}; // ### Change ###
+        break
+        case 'right':
+          area = {x: centre.vertical, shift: 0, high: shaft.diameter, long: shaft.long}; // ### Change ###      
+        break
+      }
+
+    }
+    this.init();
+
+    this.drag = function() {
+      if(held) {
+        if(checkHover(area)) {
+          console.log('Say High');
+        }
+      }
+
     }
   }
 }
@@ -152,9 +185,10 @@ function setup() {
   rectMode(CENTER);
   ellipseMode(CENTER);
 
-  held = false, isStepped = false;
+  held = false, isStepped = false, dragMode = false;
   state = [], hover = [];
   model.circlip = [], model.collar = [], model.spacer = [], model.shoulder = [];
+  move = [];
 
   for (let i=0; i<8; i++) {
     model.circlip[i] = new Constraint('circlip', i);
@@ -165,6 +199,7 @@ function setup() {
 
   model.default = [new Default('straight')];
   model.shaft = [new Default('straight'), new Default('stepped')];
+  model.move = [new Drag('shaft'), new Drag('left'), new Drag('right')];
   initialise();
 }
 
@@ -175,8 +210,16 @@ function draw() {
   for (let i=0; i<model.run.length; i++) {
     model.run[i].render();
   }
-  for (let i=0; i<model.runHighlight.length; i++){
-    model.runHighlight[i].highlight();
+
+  if(dragMode) {
+    for (let i=0; i<model.move.length; i++) {
+      model.move[i].drag();
+    }
+  }
+  else {
+    for (let i=0; i<model.runHighlight.length; i++) {
+      model.runHighlight[i].highlight();
+    }
   }
 
   // Resets held status at the end of each cycle
@@ -246,6 +289,7 @@ function initialise() {
     model.spacer[i].resetHighlight();
     model.shoulder[i].resetHighlight();    
   }
+  updateBearingTable();
 }
 
 function resetPrompt() {
@@ -263,17 +307,26 @@ function reset() {
     model.run.splice(0, 1, model.shaft[1]);
     state[0] = state[2] = 'collar';
     model.run = model.run.concat(model.collar[0]);
-
-    // Re-initialise internal constraints for stepped case
+    updateBearingTable();
     isStepped = true;
-    model.circlip.init();
-    model.collar.init();
-    model.spacer.init();
   }
   else {
     resetPrompt();
     model.run.splice(0, 1, model.shaft[0]);
-    
     isStepped = false;
+  }
+}
+
+function mode() { // ### TO ADD -> Reset checkbox tick when buttons are pressed (put into highlight mode) ### 
+  // Sets model mode (design or drag)
+  let modeCheckbox = document.getElementById("mode");
+  model.runHighlight = [];
+  if (modeCheckbox.checked) { 
+    // Drag mode
+    dragMode = true;
+  }
+  else { 
+    // Design mode
+    dragMode = false;
   }
 }
