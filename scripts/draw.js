@@ -1,10 +1,15 @@
-function drawBearing(x, diameter) {
+function drawBearing(x, diameter, merged) {
   // Draws the bearing and default housing at a given x location
   let shapeColor = ['black', 'white'], outlineSize = [2, 0],
       y = [centre.horizontal + diameter/2 + 21, centre.horizontal - diameter/2 - 20];
 
   fill(240, 240, 240);
+  if (merged) {
+    rect(centre.vertical, centre.horizontal, 0.5 * canvas.width + 70, 160, 2, 2, 2, 2);
+  }
+  else {
     rect(x, centre.horizontal, 70, 160, 2, 2, 2, 2);
+  }
   noStroke();
 
   for (let i=0; i<=1; i++) {
@@ -75,13 +80,19 @@ function drawCollar(location, returnPos, merge) {
   }
 }
 
-function drawHousing(x, diameter, location) {
+function drawHousing(x, diameter, location, merged) {
   // Draws bearing housing and shoulder at x for a given shaft diameter
   let shift = offset.left,
       stateIndex = 4,
       step = 0;
 
-  if (typeof location == 'string') {
+  if (merged) {
+    fill(200, 200, 200);
+      rect(centre.vertical, centre.horizontal + diameter/2 + 54, 0.5 * canvas.width + 70, 24);
+      rect(centre.vertical, centre.horizontal - diameter/2 - 54, 0.5 * canvas.width + 70, 24);
+    fill('white')
+  }
+  else if (typeof location == 'string') {
     fill(200, 200, 200);
       rect(x, centre.horizontal + diameter/2 + 54, 70, 24);
       rect(x, centre.horizontal - diameter/2 - 54, 70, 24);
@@ -131,8 +142,8 @@ function drawShoulder(location, returnPos) {
   // Draws housing shoulder at location
   let x = [offset.left - 27.5, offset.left + 27.5, offset.right - 27.5, offset.right + 27.5],
       shift = 66;
+  
   location -= 4;
-
   if (isStepped && location > 1) {
     shift -= (shaft.diameter - shaft.stepped)/2;
   }
@@ -146,14 +157,22 @@ function drawShoulder(location, returnPos) {
   }
 }
 
-function drawSpacer(returnPos) {
+function drawSpacer(location, returnPos) {
   // Draws spacer at location 1 and 2
+  let shift = shaft.diameter/2 + 5.5, 
+      shiftPos = 0;
+
+  if (location > 3) {
+    shift += 30.5;
+    shiftPos = 30.5;
+  }
+
   if (returnPos) {
-    return {x:centre.vertical, shift: 0, high: shaft.diameter + 20, long: canvas.width * 0.5 - 41};
+    return {x:centre.vertical, shift: shiftPos, high: shaft.diameter + 20, long: canvas.width * 0.5 - 41};
   }
   else {
-    rect(centre.vertical, centre.horizontal - shaft.diameter/2 - 5.5, canvas.width * 0.5 - 41, 11, 2, 2, 2, 2);
-    rect(centre.vertical, centre.horizontal + shaft.diameter/2 + 5.5, canvas.width * 0.5 - 41, 11, 2, 2, 2, 2);
+    rect(centre.vertical, centre.horizontal - shift, canvas.width * 0.5 - 41, 11, 2, 2, 2, 2);
+    rect(centre.vertical, centre.horizontal + shift, canvas.width * 0.5 - 41, 11, 2, 2, 2, 2);
     drawCentreline(centre.horizontal, shaft.long);
   }
 }

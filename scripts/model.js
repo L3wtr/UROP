@@ -1,15 +1,15 @@
 class Default {
   // Includes functions to render the default bearing-shaft arrangement
-  constructor(type) {
+  constructor(type, merged) {
     this.render = function() {
       let diameter = shaft.diameter;
-      if (type == 'stepped') {
+      if (shaft == 'stepped') {
         diameter = shaft.stepped;
       }
-      drawBearing(offset.left, shaft.diameter);
-      drawBearing(offset.right, diameter);
-      drawHousing(offset.left, shaft.diameter, type);
-      drawHousing(offset.right, diameter, type);
+      drawBearing(offset.left, shaft.diameter, merged);
+      drawBearing(offset.right, diameter, false);
+      drawHousing(offset.left, shaft.diameter, type, merged);
+      drawHousing(offset.right, diameter, type, merged);
       drawShaft(type);
       drawCentreline(centre.horizontal, shaft.long);
     }
@@ -56,7 +56,7 @@ class Constraint {
             }
           }
           updatePreview = function() {
-            if (!isStepped) {
+            if (!isStepped || location == 0) {
               drawCollar(location, false, false);
             }
           }
@@ -78,18 +78,21 @@ class Constraint {
         break
         case 'spacer':
           updateRender = function() {
+            if (location > 3) {
+              model.run.splice(0, 1, model.shaft[2]);
+            }
             fill(100, 100, 100)
-              drawSpacer(false);
-            state[2] = 'spacer';
+              drawSpacer(location, false);
+            state[2] = 'spacer'; // ### CHECK
             updateBearingTable();
           }
           updatePreview = function() {
             if (!isStepped) {
-              drawSpacer(false);
+              drawSpacer(location, false);
             }
           }
           updatePosition = function() {
-            return pos = drawSpacer(true);
+            return pos = drawSpacer(location, true);
           }
         break
       }
@@ -155,6 +158,14 @@ class Drag {
   }
 }
 
+class Test {
+  constructor(number) {
+    this.testFunc = function() {
+      console.log(number);
+    }
+  }
+}
+
 function setup() {
   // Canvas setup
   canvas = {
@@ -198,7 +209,8 @@ function setup() {
   }
 
   model.default = [new Default('straight')];
-  model.shaft = [new Default('straight'), new Default('stepped')];
+  model.shaft = [new Default('straight', false), new Default('stepped', false),
+                 new Default('straight', true), new Default('stepped', true)];
   model.move = [new Drag('shaft'), new Drag('left'), new Drag('right')];
   initialise();
 }
@@ -241,8 +253,11 @@ function feature(type) {
     case 'collar':
       model.runHighlight = model.collar.slice(0,4);
     break
-    case 'spacer':
+    case 'inSpacer':
       model.runHighlight = model.spacer.slice(1,2);
+    break
+    case 'outSpacer':
+      model.runHighlight = model.spacer.slice(5,6);
     break
     case 'shoulder':
       model.runHighlight = model.shoulder.slice(4,8);
@@ -305,8 +320,7 @@ function reset() {
   if (shaftCheckbox.checked) {
     resetPrompt();
     model.run.splice(0, 1, model.shaft[1]);
-    state[0] = state[2] = 'collar';
-    model.run = model.run.concat(model.collar[0]);
+    state[2] = 'collar';
     updateBearingTable();
     isStepped = true;
   }

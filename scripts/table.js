@@ -24,7 +24,7 @@ function updateBearingTable() {
   // Update bearing condition
   let condition = [document.getElementById('leftCond'), document.getElementById('rightCond')]; 
   for (let i=0; i<2; i++) {
-    if (count[i] && count[i+2] == 2) {
+    if (count[i] == 2 && count[i+2] == 2) {
       condition[i].textContent = 'Fixed';
     }
     else {

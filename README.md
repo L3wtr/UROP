@@ -5,6 +5,7 @@ Part of the Imperial Visualiations UROP. Learing tool to aid ME1 Design and Manu
 ## Authors
 
 * **Lewis Tran** - [L3wtr](https://github.com/L3wtr)
+* **Wei Chen**
 
 See also [UROP project list](https://github.com/Imperial-visualizations).
 
