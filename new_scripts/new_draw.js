@@ -2,11 +2,11 @@
 function drawBack(stepped, merged) {
   fill(240, 240, 240);
   if (merged) {
-    rect(pos.centre.x, pos.centre.y, 0.5 * canvas.dim.x + 80, shaft.dia.straight/2 + 150, 2, 2, 2, 2);
+    rect(pos.centre.x, pos.centre.y, 0.5 * canvas.dim.x + 80, shaft.dia.straight/2 + 150);
   }
   else {
-    rect(pos.offset.left, pos.centre.y, 80, shaft.dia.straight/2 + 150, 2, 2, 2, 2);
-    rect(pos.offset.right, pos.centre.y, 80, shaft.dia.straight/2 + 150, 2, 2, 2, 2);
+    rect(pos.offset.left, pos.centre.y, 80, shaft.dia.straight/2 + 150);
+    rect(pos.offset.right, pos.centre.y, 80, shaft.dia.straight/2 + 150);
   }
   fill('white');
 }
@@ -43,49 +43,8 @@ function drawBearing(x, stepped) {
   stroke('black');
 }
 
-/* Draws centreline at y for a given length */ // ### NEEDS IMPROVING ###
-function drawCentreline(y, length) {
-  let prev = canvas.dim.x * 0.025 - 4;
-  stroke('black');
-
-  for (let i=0; i<length+20; i+=20) {
-    line(prev + 4, y, prev + 16, y);
-    point(prev + 20, y);
-    prev += 20;
-  }
-  line(prev + 4, y, prev + 16, y);
-}
-
-/* Draws circlip at a given location */
-function drawCirclip(location, returnPosition) {
-  let x = [pos.offset.left - 24, pos.offset.left + 24, pos.offset.right - 24, pos.offset.right + 24],
-      shift = 30;
-
-  if (location == 3 && basic.stepped) {
-      shift -= (shaft.dia.straight - shaft.dia.stepped)/2; 
-  }
-
-  if (location > 3) {
-    shift += 45;
-    location -= 4;
-  }
-
-  if (basic.stepped) {
-    x[2] -= 4;
-    x[3] += 4;
-  }
-
-  if (returnPosition) {
-    return {x: x[location], shift: shift, high: 12, long: 6};
-  }
-  else {
-    rect(x[location], pos.centre.y + shift, 6, 12, 1, 1, 1, 1);
-    rect(x[location], pos.centre.y - shift, 6, 12, 1, 1, 1, 1);
-  }
-}
-
 /* Draws bearing housing */
-function drawHousing(x, stepped, merged) {
+function drawHousing(x, merged) {
   fill(200, 200, 200);
   if (merged) {
     rect(pos.centre.x, pos.centre.y + shaft.dia.straight/2 + 57, 0.5 * canvas.dim.x + 80, 24);
@@ -106,5 +65,88 @@ function drawShaft(stepped) {
   }
   else {
     rect(pos.centre.x, pos.centre.y, shaft.dim.x, shaft.dia.straight, 3, 3, 3, 3);
+  }
+}
+
+/* Draws centreline at y for a given length */ // ### NEEDS IMPROVING ###
+function drawCentreline(y, length) {
+  let prev = canvas.dim.x * 0.025 - 4;
+  stroke('black');
+
+  for (let i=0; i<length+20; i+=20) {
+    line(prev + 4, y, prev + 16, y);
+    point(prev + 20, y);
+    prev += 20;
+  }
+  line(prev + 4, y, prev + 16, y);
+}
+
+/* Draws circlip at a given location */
+function drawCirclip(location, stepped, returnPosition) {
+  let x = [pos.offset.left - 24, pos.offset.left + 24, pos.offset.right - 24, pos.offset.right + 24],
+      shift = 30;
+
+  if (location == 3 && stepped) {
+    shift -= (shaft.dia.straight - shaft.dia.stepped)/2; 
+  }
+
+  if (location > 3) {
+    shift += 45;
+    location -= 4;
+  }
+
+  if (stepped) {
+    x[2] -= 4;
+    x[3] += 4;
+  }
+
+  if (returnPosition) {
+    return {x: x[location], shift: shift, long: 6, high: 12};
+  }
+  else {
+    rect(x[location], pos.centre.y + shift, 6, 12, 1, 1, 1, 1);
+    rect(x[location], pos.centre.y - shift, 6, 12, 1, 1, 1, 1);
+  }
+}
+
+/* Draws collar at given location and merges common central collars */
+function drawCollar(location, common, returnPosition) {
+  let length = canvas.dim.x * 0.2 - 20,
+      x = [pos.offset.left - 20.5 - length/2, pos.offset.left + 20.5 + length/2,
+           pos.offset.right - 20.5 - length/2, pos.offset.right + 20.5 + length/2];
+
+  if (common) {
+    x[location] = pos.centre.x;
+    length = canvas.dim.x * 0.5 - 41;
+  }
+
+  if (returnPosition) {
+    return {x: x[location], shift: 0, long: length, high: shaft.dia.straight + 26};
+  }
+  else {
+    rect(x[location], pos.centre.y, length, shaft.dia.straight + 26, 3, 3, 3, 3);
+    drawCentreline(pos.centre.y, shaft.dim.x);
+  }
+}
+
+
+/* Draws spacer at locations 1 or 5 */
+function drawSpacer(location, stepped, returnPosition) {
+  let shift = shaft.dia.straight/2 + 6.5,
+      step = 0;
+
+  if (location > 3) {
+    shift += 32;
+    if (stepped) {
+      step = 4.5;
+    }
+  }
+
+  if (returnPosition) {
+    return {x: pos.centre.x - step/2, shift: shift, long: canvas.dim.x * 0.5 - 41 - step, high: 13};
+  }
+  else {
+    rect(pos.centre.x - step/2, pos.centre.y - shift, canvas.dim.x * 0.5 - 41 - step, 13, 2, 2, 2, 2);
+    rect(pos.centre.x - step/2, pos.centre.y + shift, canvas.dim.x * 0.5 - 41 - step, 13, 2, 2, 2, 2);
   }
 }

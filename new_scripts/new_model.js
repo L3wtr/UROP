@@ -1,30 +1,30 @@
 /* Default class to render the bearing-shaft arrangement */
 class Default {
-  constructor(style, layer) {
+  constructor(layer) {
     let updateRender = function() {};
 
     this.init = function() {
-      switch(style.layer[layer]) {
+      switch(basic.layer[layer]) {
         case 'back':
           updateRender = function() {
-            drawBack(style.stepped, style.merged)
+            drawBack(basic.stepped, basic.merged)
           }
         break
         case 'bearing':
           updateRender = function() {
             drawBearing(pos.offset.left, false);
-            drawBearing(pos.offset.right, style.stepped);
+            drawBearing(pos.offset.right, basic.stepped);
           }
         break
         case 'housing':
           updateRender = function() {
-            drawHousing(pos.offset.left, false, style.merged);
-            drawHousing(pos.offset.right, style.stepped, style.merged)
+            drawHousing(pos.offset.left, basic.merged);
+            drawHousing(pos.offset.right, basic.merged)
           }
         break
         case 'shaft':
           updateRender = function() {
-            drawShaft(style.stepped);
+            drawShaft(basic.stepped);
           }
         break
         case 'line':
@@ -60,17 +60,58 @@ class Constraint {
         case 'circlip':
           updateRender = function() {
             fill(100, 100, 100)
-            if (!basic.stepped || location != 2) {
-              drawCirclip(location, false);
-            }
+            drawCirclip(location, basic.stepped);
           }
           updatePreview = function() {
             if (!basic.stepped || location != 2) {
-              drawCirclip(location, false);
+              drawCirclip(location, basic.stepped);
             }
           }
           updatePosition = function() {
-            return position = drawCirclip(location, true);
+            return position = drawCirclip(location, basic.stepped, true);
+          }
+        break
+        case 'collar':
+          updateRender = function() {
+            fill('white')
+            if ((location == 1 && state[2] == 'collar') || (location == 2 && state[1] == 'collar')) {
+              drawCollar(location, true);
+            }
+            else {
+              drawCollar(location, false);
+            }
+          }
+          updatePreview = function() {
+            if (!basic.stepped || location == 0) {
+              drawCollar(location, false);
+            }
+          }
+          updatePosition = function() {
+            return position = drawCollar(location, false, true);
+          }
+        break
+        case 'spacer':
+          updateRender = function() {
+            let stateIndex = 0;
+            if (location > 3) {
+              stateIndex = 4;
+              basic.merged = true;
+            } 
+            fill(100, 100, 100)
+            drawSpacer(location, basic.stepped);
+            state[2 + stateIndex] = 'spacer';
+          }
+          updatePreview = function() {
+            let stateIndex = 0;
+            if (location > 3) {
+              stateIndex = 4;
+            } 
+            if(state[1 + stateIndex] == 'empty' && state[2 + stateIndex] == 'empty') {
+              drawSpacer(location, basic.stepped)
+            }
+          }
+          updatePosition = function() {
+            return position = drawSpacer(location, basic.stepped, true);
           }
         break
       }
@@ -86,11 +127,11 @@ class Constraint {
     }
 
     this.highlight = function() {
-      if (state[location] == 'empty' && !(type == 'spacer' && (state[1] != 'empty' || state[2] != 'empty'))) {
+      if (state[location] == 'empty') {
         [redRGB, rate] = highlightConstraint([redRGB, rate], updatePreview);
         if (held) {
           if (checkHover(updatePosition())) {
-            design.run = design.run.concat(this);
+            design.run[location] = this;
             state[location] = type;
           }
         }
@@ -149,7 +190,7 @@ function setup() {
 
   design = [];
   design.default = [], design.run = [];
-  typeName = ['circlip', 'collar', 'inSpacer', 'outSpacer', 'shoulder'];
+  typeName = ['circlip', 'collar', 'spacer', 'shoulder'];
 
   for (let i=0; i<typeName.length; i++) {
     design[typeName[i]] = [];
@@ -171,7 +212,9 @@ function draw() {
   }
 
   for (let i=0; i<design.run.length; i++) {
-    design.run[i].render();
+    if (design.run[i] != undefined) {
+      design.run[i].render();
+    }
   }
 
   for (let i=0; i<design.runHighlight.length; i++) {
@@ -186,19 +229,22 @@ function draw() {
 /* Initialises design models with latest parameters */
 function initialise() {
   for (let i=0; i<basic.layer.length; i++) {
-    design.default[i] = new Default(basic, i);
+    design.default[i] = new Default(i);
   }
 }
 
 /* Resets design model */
 function reset() {
-  for (let i=0; i<design.run.length; i++) {
-    design.run[i].resetHighlight();
-  }
   design.run = [];
   design.runHighlight = [];
+  basic.merged = false;
   for (let i =0; i<8; i++) {
     state[i] = 'empty';   
+  }
+  for (let i=0; i<typeName.length; i++) {
+    for (let j=0; j<8; j++) {
+      design[typeName[i]][j].resetHighlight();
+    }
   }
 }
 
@@ -216,10 +262,10 @@ function feature(type) {
       design.runHighlight = design.collar.slice(0,4);
     break
     case 'inSpacer':
-      design.runHighlight = design.inSpacer.slice(1,2);
+      design.runHighlight = design.spacer.slice(1,2);
     break
     case 'outSpacer':
-      design.runHighlight = design.outSpacer.slice(5,6);
+      design.runHighlight = design.spacer.slice(5,6);
     break
     case 'shoulder':
       design.runHighlight = design.shoulder.slice(4,8);
@@ -232,11 +278,26 @@ function updateStyle() {
   let shaftCheckbox = document.getElementById("shaft");
   if (shaftCheckbox.checked) {
     basic.stepped = true;
+    removeConstraint('collar', [1, 3]);
+    removeConstraint('spacer', [1]);
+    removeConstraint('all', [2]);
+    state[2] = 'collar';
   }
   else {
     basic.stepped = false;
+    state[2] = 'empty';
   }
   initialise();
+}
+
+/* Removes a constraint at a given array of locations */ 
+function removeConstraint(type, locations) {
+  for (let i=0; i<locations.length; i++) {
+    if (type == 'all' || state[locations[i]] == type) {
+      state[locations[i]] = 'empty';
+      design.run[locations[i]] = undefined;
+    }
+  }
 }
 
 /* p5 function that triggers when the mouse is pressed and released */
