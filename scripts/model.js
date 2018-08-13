@@ -7,7 +7,7 @@ class Default {
       switch(basic.layer[layer]) {
         case 'back':
           updateRender = function() {
-            drawBack(basic.stepped, basic.merged)
+            drawBack(basic.stepped, basic.merged);
           }
         break
         case 'bearing':
@@ -18,8 +18,8 @@ class Default {
         break
         case 'housing':
           updateRender = function() {
-            drawHousing(pos.offset.left, basic.merged);
-            drawHousing(pos.offset.right, basic.merged)
+            drawBasicHousing(pos.offset.left, basic.merged);
+            drawBasicHousing(pos.offset.right, basic.merged);
           }
         break
         case 'shaft':
@@ -59,7 +59,7 @@ class Constraint {
       switch(type) {
         case 'circlip':
           updateRender = function() {
-            fill(100, 100, 100)
+            fill(100, 100, 100);
             drawCirclip(location, basic.stepped);
           }
           updatePreview = function() {
@@ -73,7 +73,7 @@ class Constraint {
         break
         case 'collar':
           updateRender = function() {
-            fill('white')
+            fill('white');
             if ((location == 1 && state[2] == 'collar') || (location == 2 && state[1] == 'collar')) {
               drawCollar(location, true);
             }
@@ -97,7 +97,7 @@ class Constraint {
               stateIndex = 4;
               basic.merged = true;
             } 
-            fill(100, 100, 100)
+            fill(100, 100, 100);
             drawSpacer(location, basic.stepped);
             state[2 + stateIndex] = 'spacer';
           }
@@ -112,6 +112,18 @@ class Constraint {
           }
           updatePosition = function() {
             return position = drawSpacer(location, basic.stepped, true);
+          }
+        break
+        case 'shoulder':
+          updateRender = function() {
+            fill(200, 200, 200)
+            drawCustomHousing(location, basic.stepped);
+          }
+          updatePreview = function() {
+            drawShoulder(location, basic.stepped);
+          }
+          updatePosition = function() {
+            return position = drawShoulder(location, basic.stepped, true);
           }
         break
       }
@@ -157,7 +169,7 @@ function setup() {
       x: canvas.dim.x * 0.9,
     },
     dia: {
-      straight: 60,
+      straight: 70,
       stepped: 38,
     },
   };
@@ -224,6 +236,8 @@ function draw() {
   if (held) {
     held = false;
   }
+
+  updateBearingTable();
 }
 
 /* Initialises design models with latest parameters */

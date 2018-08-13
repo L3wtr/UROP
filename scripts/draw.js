@@ -13,27 +13,28 @@ function drawBack(stepped, merged) {
 
 /* Draws bearing at a given x location for stepped and non-stepped shafts */
 function drawBearing(x, stepped) {
-  let shapeColor = ['black', 'white'], 
+  let shapeColour = ['black', 'white'], 
       outline = [2, 0],
-      y = [pos.centre.y + shaft.dia.straight/2 + 23, pos.centre.y - shaft.dia.straight/2 - 22];    
+      y = [pos.centre.y + (shaft.dia.straight - shaft.dia.stepped)/2 + 42, 
+           pos.centre.y - (shaft.dia.straight - shaft.dia.stepped)/2 - 41];    
 
   noStroke();
   if (stepped) {
     for (let i=0; i<2; i++) {
       let sign = -1;
-      for (let j=0; j<2; j++) {
-        fill(shapeColor[i]);
-        rect(x + 0.5, y[j] - sign*14.5, 48 + outline[i], 15 + outline[i], 1, 1, 1, 1);
-        rect(x + 0.5, y[j] + sign*25.5, 48 + outline[i], 15 + outline[i], 1, 1, 1, 1);
-        ellipse(x + 0.5, y[j] + sign*5.5, 28 + outline[i], 28 + outline[i]);
+      for (let j=0; j<outline.length; j++) {
+        fill(shapeColour[i]);
+        rect(x + 0.5, y[j] - sign*14.5, 48.5 + outline[i], 15 + outline[i], 1, 1, 1, 1);
+        rect(x + 0.5, y[j] + sign*30.5, 48.5 + outline[i], 15 + outline[i], 1, 1, 1, 1);
+        ellipse(x + 0.5, y[j] + sign*8, 34 + outline[i], 34 + outline[i]);
         sign = 1;
       }
     }
   }
   else {
     for (let i=0; i<2; i++) {
-      for (let j=0; j<2; j++) {
-        fill(shapeColor[i]);
+      for (let j=0; j<outline.length; j++) {
+        fill(shapeColour[i]);
         rect(x + 0.5, y[j] - 16, 40 + outline[i], 12 + outline[i], 1, 1, 1, 1);
         rect(x + 0.5, y[j] + 16, 40 + outline[i], 12 + outline[i], 1, 1, 1, 1);
         ellipse(x + 0.5, y[j], 24 + outline[i], 24 + outline[i]);
@@ -44,7 +45,7 @@ function drawBearing(x, stepped) {
 }
 
 /* Draws bearing housing */
-function drawHousing(x, merged) {
+function drawBasicHousing(x, merged) {
   fill(200, 200, 200);
   if (merged) {
     rect(pos.centre.x, pos.centre.y + shaft.dia.straight/2 + 57, 0.5 * canvas.dim.x + 80, 24);
@@ -84,7 +85,7 @@ function drawCentreline(y, length) {
 /* Draws circlip at a given location */
 function drawCirclip(location, stepped, returnPosition) {
   let x = [pos.offset.left - 24, pos.offset.left + 24, pos.offset.right - 24, pos.offset.right + 24],
-      shift = 30;
+      shift = shaft.dia.straight/2;
 
   if (location == 3 && stepped) {
     shift -= (shaft.dia.straight - shaft.dia.stepped)/2; 
@@ -149,4 +150,51 @@ function drawSpacer(location, stepped, returnPosition) {
     rect(pos.centre.x - step/2, pos.centre.y - shift, canvas.dim.x * 0.5 - 41 - step, 13, 2, 2, 2, 2);
     rect(pos.centre.x - step/2, pos.centre.y + shift, canvas.dim.x * 0.5 - 41 - step, 13, 2, 2, 2, 2);
   }
+}
+
+/* Draws housing shoulder at location (preview only) */
+function drawShoulder(location, stepped, returnPosition) {
+  let x = [pos.offset.left - 30, pos.offset.left + 30, pos.offset.right - 30, pos.offset.right + 30],
+      shift = 38.5,
+      step = {x: 0, y: 0};
+  
+  location -= 4;
+  if (stepped && location > 1) {
+    step.x = 4;
+    step.y = 3;
+    x[2] -= step.x/2;
+    x[3] += step.x/2;
+  }
+
+  if (returnPosition) {
+    return {x: x[location], shift: shaft.dia.straight/2 + shift - step.y/2, long: 19 - step.x, high: 13 + step.y};
+  }
+  else {
+    rect(x[location], pos.centre.y + shaft.dia.straight/2 + shift - step.y/2, 19 - step.x, 13 + step.y);
+    rect(x[location], pos.centre.y - shaft.dia.straight/2 - shift + step.y/2, 19 - step.x, 13 + step.y);
+  }
+}
+
+/* Draws a custom housing with shoulders */
+function drawCustomHousing(location, stepped) {
+  let shapeColour = ['black', 200], 
+      outline = [0, -2],
+      step = {x: 0, y: 0},
+      x = [pos.offset.left - 29.5, pos.offset.left + 30.5, pos.offset.right - 29.5, pos.offset.right + 30.5];
+
+  location -=4;
+  if (stepped && location > 1) {
+    step.x = 4;
+    step.y = 3;
+    x[2] -= step.x/2;
+    x[3] += step.x/2;
+  }
+
+  noStroke()
+    for (let i=0; i<outline.length; i++) {
+      fill(shapeColour[i]);
+      rect(x[location], pos.centre.y + shaft.dia.straight/2 + 38.5 - outline[i] - step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
+      rect(x[location], pos.centre.y - shaft.dia.straight/2 - 37.5 + outline[i] + step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
+    }
+  stroke('black');
 }
