@@ -22,9 +22,6 @@
 </head>
 
 <body>
-
-  <div> <br> <br> <br> <br> </div> <!-- ### Temporary until CSS fix ### -->
-
   <div class="container">
     <div class="row">
       <div class="eight columns">
@@ -60,18 +57,18 @@
     <div class="row">
       <div class="five columns">
         <h5>Internal Constraints</h5>
-          <input id="extCirclip" value="External Circlip" type="button" onclick="feature('intCirclip')">
+          <input id="extCirclip" value="External Circlip" type="button" onclick="feature('extCirclip')">
           <input id="collar" value="Collar" type="button" onclick="feature('collar')">
           <input id="inSpacer" value="Spacer" type="button" onclick="feature('inSpacer')">
         <h5>External Constraints</h5>
-          <input id="intCirclip" value="Internal Circlip" type="button" onclick="feature('extCirclip')">
+          <input id="intCirclip" value="Internal Circlip" type="button" onclick="feature('intCirclip')">
           <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">
           <input id="outSpacer" value="Spacer" type="button" onclick="feature('outSpacer')">
       </div>
 
       <div class="three columns">
         <h5>Options</h5> 
-          Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="reset()"><br>
+          Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="updateStyle()"><br>
           Design/Drag Mode Toggle <input id="mode" type="checkbox" onclick="mode()"><br>
           Sketch/Drawing Mode Toggle <input id="drawing" type="checkbox"><br>
           <input id="reset" value="Reset" type="button" onclick="reset()">
