@@ -29,7 +29,7 @@ class Default {
         break
         case 'line':
           updateRender = function() {
-            drawCentreline(pos.centre.y, shaft.dim.x);
+            drawCentreline(pos.centre.y, canvas.dim.x * 0.95);
           }
         break
       }
@@ -260,6 +260,7 @@ function reset() {
       design[typeName[i]][j].resetHighlight();
     }
   }
+  updateStyle();
 }
 
 /* Assigns constraint type */

@@ -69,12 +69,13 @@ function drawShaft(stepped) {
   }
 }
 
-/* Draws centreline at y for a given length */ // ### NEEDS IMPROVING ###
+/* Draws centreline at y for a given length */
 function drawCentreline(y, length) {
-  let prev = canvas.dim.x * 0.025 - 4;
-  stroke('black');
+  let n = (length - 4)/20,
+      prev = (length - (Math.floor(n)-1)*20)/2;
 
-  for (let i=0; i<length+20; i+=20) {
+  stroke('black');
+  for (let i=0; i<n-1; i++) {
     line(prev + 4, y, prev + 16, y);
     point(prev + 20, y);
     prev += 20;
@@ -126,29 +127,29 @@ function drawCollar(location, common, returnPosition) {
   }
   else {
     rect(x[location], pos.centre.y, length, shaft.dia.straight + 26, 3, 3, 3, 3);
-    drawCentreline(pos.centre.y, shaft.dim.x);
+    drawCentreline(pos.centre.y, canvas.dim.x * 0.95);
   }
 }
 
 
 /* Draws spacer at locations 1 or 5 */
 function drawSpacer(location, stepped, returnPosition) {
-  let shift = shaft.dia.straight/2 + 6.5,
+  let shift = shaft.dia.straight/2 + 7.5,
       step = 0;
 
   if (location > 3) {
-    shift += 32;
+    shift += 30;
     if (stepped) {
       step = 4.5;
     }
   }
 
   if (returnPosition) {
-    return {x: pos.centre.x - step/2, shift: shift, long: canvas.dim.x * 0.5 - 41 - step, high: 13};
+    return {x: pos.centre.x - step/2, shift: shift, long: canvas.dim.x * 0.5 - 41 - step, high: 15};
   }
   else {
-    rect(pos.centre.x - step/2, pos.centre.y - shift, canvas.dim.x * 0.5 - 41 - step, 13, 2, 2, 2, 2);
-    rect(pos.centre.x - step/2, pos.centre.y + shift, canvas.dim.x * 0.5 - 41 - step, 13, 2, 2, 2, 2);
+    rect(pos.centre.x - step/2, pos.centre.y - shift, canvas.dim.x * 0.5 - 41 - step, 15, 2, 2, 2, 2);
+    rect(pos.centre.x - step/2, pos.centre.y + shift, canvas.dim.x * 0.5 - 41 - step, 15, 2, 2, 2, 2);
   }
 }
 
