@@ -255,11 +255,6 @@ function reset() {
   for (let i =0; i<8; i++) {
     state[i] = 'empty';   
   }
-  for (let i=0; i<typeName.length; i++) {
-    for (let j=0; j<8; j++) {
-      design[typeName[i]][j].resetHighlight();
-    }
-  }
   updateStyle();
 }
 
@@ -301,6 +296,12 @@ function updateStyle() {
   else {
     basic.stepped = false;
     state[2] = 'empty';
+  }
+  
+  for (let i=0; i<typeName.length; i++) {
+    for (let j=0; j<8; j++) {
+      design[typeName[i]][j].resetHighlight();
+    }
   }
   initialise();
 }

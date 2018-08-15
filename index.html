@@ -9,7 +9,7 @@
   <!-- CSS -->
   <link rel="stylesheet" href="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/skeleton.css">
   <link rel="stylesheet" href="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/style.css">
-  <link rel="stylesheet" href="styles/test.css">
+  <link rel="stylesheet" href="styles/local.css">
 
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js"></script>
@@ -18,65 +18,71 @@
   <!-- Local Scripts -->
   <script src="scripts/draw.js"></script>
   <script src="scripts/model.js"></script>
+
   <script src="scripts/table.js"></script>
 </head>
 
 <body>
   <div class="container">
     <div class="row">
-      <div class="eight columns">
+      <div class="two-thirds column">
         <div id="model.ID"></div>
+
+        <div class="selection">
+          <h5>Internal Constraints</h5>
+            <input id="extCirclip" value="External Circlip" type="button" onclick="feature('extCirclip')">
+            <input id="collar" value="Collar" type="button" onclick="feature('collar')">
+            <input id="inSpacer" value="Spacer" type="button" onclick="feature('inSpacer')">
+          <h5>External Constraints</h5>
+            <input id="intCirclip" value="Internal Circlip" type="button" onclick="feature('intCirclip')">
+            <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">
+            <input id="outSpacer" value="Spacer" type="button" onclick="feature('outSpacer')">
+        </div>
+        <div class="options">
+          <h5>Options</h5>
+            Shaft Type <input id="shaft" type="checkbox" onclick="updateStyle()"><br>
+            Design/Drag Mode Toggle <input id="mode" type="checkbox"><br>
+            Include hidden details <input id="drawing" type="checkbox"><br>
+          <input id="reset" class="button-primary" type="button" value="Reset" onclick="reset()">
+        </div>
       </div>
 
-      <div class="four columns">
-        <table>
+      <div class="one-third column">
+        <table id="bearing-table">
           <tr>
             <td></td>
-            <th>Internal Constraints</th>
-            <th>External Constraints</th>
-            <th>Condition</td>
+            <td class="table-heading">Internal Contraints</td>
+            <td class="table-heading">External Constraints</td>
           </tr>
           <tr>
-            <th> Left Bearing </th>
+            <td rowspan="2" class="table-heading"> Left Bearing</td>
             <td id="leftInt"></td>
             <td id="leftExt"></td>
-            <td id="leftCond"></td>
           </tr>
           <tr>
-            <th> Right Bearing </th>
+            <td id="leftIntCon"></td>
+            <td id="leftExtCon"></td>
+          </tr>
+          <tr>
+            <td rowspan="2" class="table-heading"> Right Bearing</td>
             <td id="rightInt"></td>
             <td id="rightExt"></td>
-            <td id="rightCond"></td>
+          </tr>
+          <tr>
+            <td id="rightIntCon"></td>
+            <td id="rightExtCon"></td>
           </tr>
         </table>
-      </div>
-    </div>
-  </div>
-  
-  <div class="container">
-    <div class="row">
-      <div class="five columns">
-        <h5>Internal Constraints</h5>
-          <input id="extCirclip" value="External Circlip" type="button" onclick="feature('extCirclip')">
-          <input id="collar" value="Collar" type="button" onclick="feature('collar')">
-          <input id="inSpacer" value="Spacer" type="button" onclick="feature('inSpacer')">
-        <h5>External Constraints</h5>
-          <input id="intCirclip" value="Internal Circlip" type="button" onclick="feature('intCirclip')">
-          <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">
-          <input id="outSpacer" value="Spacer" type="button" onclick="feature('outSpacer')">
-      </div>
 
-      <div class="three columns">
-        <h5>Options</h5> 
-          Straight/Stepped Shaft Toggle <input id="shaft" type="checkbox" onclick="updateStyle()"><br>
-          Design/Drag Mode Toggle <input id="mode" type="checkbox" onclick="mode()"><br>
-          Sketch/Drawing Mode Toggle <input id="drawing" type="checkbox"><br>
-          <input id="reset" value="Reset" type="button" onclick="reset()">
+        <div id="round-box">
+          <label class="overall" for="status">Overall Condition: </label>
+          <output class="status" id="status"></output>
+        </div>
       </div>
     </div>
   </div>
 
-  <script src="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/navigator.js"></script>  
+  <script src="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/navigator.js"></script>
 </body>
 
 </html>

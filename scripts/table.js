@@ -1,5 +1,5 @@
+/* Updates values and conditions in the bearing table */
 function updateBearingTable() {
-  // Updates values and conditions in the bearing table
   let count = [0, 0, 0, 0],
       index;             
   for (let i=0; i<8; i++) {
@@ -16,19 +16,38 @@ function updateBearingTable() {
     let conString = count.toString().split(',');
     let bearingCount = [document.getElementById('leftInt'), document.getElementById('rightInt'), 
                         document.getElementById('leftExt'), document.getElementById('rightExt')];
-    for (let i=0; i<4; i++) {
+    for (let i=0; i<count.length; i++) {
       bearingCount[i].textContent = conString[i] + '/2';
     }
   }    
     
   // Update bearing condition
-  let condition = [document.getElementById('leftCond'), document.getElementById('rightCond')]; 
-  for (let i=0; i<2; i++) {
-    if (count[i] == 2 && count[i+2] == 2) {
-      condition[i].textContent = 'Fixed';
+  let condition = ['Floating', 'Undetermined', 'Fixed'],
+      bearingCon = [document.getElementById('leftIntCon'), document.getElementById('rightIntCon'), 
+                   document.getElementById('leftExtCon'), document.getElementById('rightExtCon')];
+  for (let i=0; i<count.length; i++) {
+    bearingCon[i].textContent = condition[count[i]];
+  }
+
+  // Update constraint status
+  let countSum = count.reduce((total, amount) => total + amount);
+  let status = document.getElementById('status');
+
+  for (let i = 0; i<count.length; i++) {
+    if (countSum < 6 ){
+      status.textContent = 'Under Constrained';
+    }
+    else if (countSum > 6) {
+      status.textContent = 'Over Constrained';
     }
     else {
-      condition[i].textContent = 'Floating';
+      if(count[i] == 0) {
+        status.textContent = 'Adequately Constrained';
+        break;
+      }
+      else {
+        status.textContent = 'Inadequately Constrained';
+      }       
     }
   }
 }
