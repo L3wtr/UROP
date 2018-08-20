@@ -25,7 +25,7 @@ input[type="button"].button-primary:focus {
 
 .options {
   float: left;
-  padding-left: 10%;
+  padding-left: 20%;
 }
 
 /* Fixing misalignment of navigation icon */
@@ -114,7 +114,7 @@ td {
   letter-spacing: .05rem;
   text-align: center;
   text-transform: uppercase;
-  padding: 6px 14px;
+  padding: 6px 12px 5px 10px;
   border: 1px solid rgba(0, 0, 0, 0.2);
   -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);

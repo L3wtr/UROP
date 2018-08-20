@@ -200,7 +200,7 @@ function drawCustomHousing(location, stepped, common) {
       }
     }
     else {
-      if (!common && (location == 1 || location == 2)) {
+      if (!common && (location == 1 || location == 2) || location == 0 || location == 3) {
         for (let i=0; i<outline.length; i++) {
           fill(shapeColour[i]);
           rect(x[location], pos.centre.y + shaft.dia.straight/2 + 38.5 - outline[i] - step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
