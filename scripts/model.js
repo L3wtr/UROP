@@ -65,6 +65,7 @@ class Constraint {
           updatePreview = function() {
             if (!basic.stepped || location != 2) {
               drawCirclip(location, basic.stepped);
+              return true;
             }
           }
           updatePosition = function() {
@@ -84,6 +85,7 @@ class Constraint {
           updatePreview = function() {
             if (!basic.stepped || location == 0) {
               drawCollar(location, false);
+              return true;
             }
           }
           updatePosition = function() {
@@ -95,11 +97,22 @@ class Constraint {
             let stateIndex = 0;
             if (location > 3) {
               stateIndex = 4;
-              basic.merged = true;
-            } 
-            fill(100, 100, 100);
-            drawSpacer(location, basic.stepped);
-            state[2 + stateIndex] = 'spacer';
+              if (!mergeAlert && !basic.merged) {
+                if (confirm('This will merge the bearing housings. Do you wish to continue?')) {
+                  basic.merged = true;
+                  document.getElementById('housing').checked = true;
+                  mergeAlert = true;
+                }
+                else {
+                  removeConstraint('spacer', [5, 6]);
+                }
+              }
+            }
+            if (basic.merged || location < 3) {
+              fill(100, 100, 100);
+              drawSpacer(location, basic.stepped);
+              state[2 + stateIndex] = 'spacer';
+            }
           }
           updatePreview = function() {
             let stateIndex = 0;
@@ -108,6 +121,7 @@ class Constraint {
             } 
             if(state[1 + stateIndex] == 'empty' && state[2 + stateIndex] == 'empty') {
               drawSpacer(location, basic.stepped)
+              return true;
             }
           }
           updatePosition = function() {
@@ -117,10 +131,17 @@ class Constraint {
         case 'shoulder':
           updateRender = function() {
             fill(200, 200, 200)
-            drawCustomHousing(location, basic.stepped);
+
+            if (((location == 5 && state[6] == 'shoulder') || (location == 6 && state[5] == 'shoulder')) && basic.merged) {
+              drawCustomHousing(location, basic.stepped, true);
+            }
+            else {
+              drawCustomHousing(location, basic.stepped, false);
+            }
           }
           updatePreview = function() {
             drawShoulder(location, basic.stepped);
+            return true;
           }
           updatePosition = function() {
             return position = drawShoulder(location, basic.stepped, true);
@@ -141,7 +162,7 @@ class Constraint {
     this.highlight = function() {
       if (state[location] == 'empty') {
         [redRGB, rate] = highlightConstraint([redRGB, rate], updatePreview);
-        if (held) {
+        if (held && updatePreview()) {
           if (checkHover(updatePosition())) {
             design.run[location] = this;
             state[location] = type;
@@ -198,6 +219,7 @@ function setup() {
   ellipseMode(CENTER);
 
   held = false;
+  mergeAlert = false;
   state = [];
 
   design = [];
@@ -251,9 +273,8 @@ function initialise() {
 function reset() {
   design.run = [];
   design.runHighlight = [];
-  basic.merged = false;
   for (let i =0; i<8; i++) {
-    state[i] = 'empty';   
+    state[i] = 'empty';
   }
   updateStyle();
 }
@@ -285,8 +306,8 @@ function feature(type) {
 
 /* Updates the chosen shaft style */
 function updateStyle() {
-  let shaftCheckbox = document.getElementById("shaft");
-  if (shaftCheckbox.checked) {
+  let stepCheck = document.querySelector('input[name="switch"]:checked').value;
+  if (stepCheck == 'stepped') {
     basic.stepped = true;
     removeConstraint('collar', [1, 3]);
     removeConstraint('spacer', [1]);
@@ -304,6 +325,25 @@ function updateStyle() {
     }
   }
   initialise();
+}
+
+/* Updates bearing housing (merged or unmerged) */
+function updateHousing() {
+  let mergeCheck = document.getElementById('housing');
+  if (mergeCheck.checked) {
+    basic.merged = true;
+  }
+  else {
+    basic.merged = false;
+    mergeAlert = false;
+    removeConstraint('spacer', [5, 6]);
+  }
+
+  for (let i=0; i<typeName.length; i++) {
+    for (let j=0; j<8; j++) {
+      design[typeName[i]][j].resetHighlight();
+    }
+  }
 }
 
 /* Removes a constraint at a given array of locations */ 

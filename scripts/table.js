@@ -31,22 +31,27 @@ function updateBearingTable() {
 
   // Update constraint status
   let countSum = count.reduce((total, amount) => total + amount);
-  let status = document.getElementById('status');
+  let status = document.getElementById('status'),
+      box = document.getElementById("round-box");
 
   for (let i = 0; i<count.length; i++) {
     if (countSum < 6 ){
       status.textContent = 'Under Constrained';
+      box.style.backgroundColor = "#ffcccc";
     }
     else if (countSum > 6) {
       status.textContent = 'Over Constrained';
+      box.style.backgroundColor = "#ffcccc";
     }
     else {
       if(count[i] == 0) {
         status.textContent = 'Adequately Constrained';
+        box.style.backgroundColor = "#ccffcc";
         break;
       }
       else {
         status.textContent = 'Inadequately Constrained';
+        box.style.backgroundColor = "#ffffcc";
       }       
     }
   }

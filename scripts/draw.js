@@ -176,8 +176,8 @@ function drawShoulder(location, stepped, returnPosition) {
   }
 }
 
-/* Draws a custom housing with shoulders */
-function drawCustomHousing(location, stepped) {
+/* Draws a custom housing with shoulders and merges common central shoulders */
+function drawCustomHousing(location, stepped, common) {
   let shapeColour = ['black', 200], 
       outline = [0, -2],
       step = {x: 0, y: 0},
@@ -192,10 +192,21 @@ function drawCustomHousing(location, stepped) {
   }
 
   noStroke()
-    for (let i=0; i<outline.length; i++) {
-      fill(shapeColour[i]);
-      rect(x[location], pos.centre.y + shaft.dia.straight/2 + 38.5 - outline[i] - step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
-      rect(x[location], pos.centre.y - shaft.dia.straight/2 - 37.5 + outline[i] + step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
+    if (common && location == 2) {
+      for (let i=0; i<outline.length; i++) {
+        fill(shapeColour[i]);
+        rect(pos.centre.x + 0.5 - step.x/2, pos.centre.y + shaft.dia.straight/2 + 38.5 - outline[i] - step.y/2, canvas.dim.x*0.5 - 39 + outline[i] - step.x, 13 - outline[i] + step.y);
+        rect(pos.centre.x + 0.5 - step.x/2, pos.centre.y - shaft.dia.straight/2 - 37.5 + outline[i] + step.y/2, canvas.dim.x*0.5 - 39 + outline[i] - step.x, 13 - outline[i] + step.y);
+      }
+    }
+    else {
+      if (!common && (location == 1 || location == 2)) {
+        for (let i=0; i<outline.length; i++) {
+          fill(shapeColour[i]);
+          rect(x[location], pos.centre.y + shaft.dia.straight/2 + 38.5 - outline[i] - step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
+          rect(x[location], pos.centre.y - shaft.dia.straight/2 - 37.5 + outline[i] + step.y/2, 21 + outline[i] - step.x, 13 - outline[i] + step.y);
+        }
+      }
     }
   stroke('black');
 }

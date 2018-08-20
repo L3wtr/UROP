@@ -40,9 +40,17 @@
         </div>
         <div class="options">
           <h5>Options</h5>
-            Shaft Type <input id="shaft" type="checkbox" onclick="updateStyle()"><br>
-            Design/Drag Mode Toggle <input id="mode" type="checkbox"><br>
-            Include hidden details <input id="drawing" type="checkbox"><br>
+            Shaft type:
+
+    <div class="switch-field">
+      <input onclick="updateStyle()" type="radio" id="straight" name="switch" value="straight" checked/>
+      <label for="straight">Straight</label>
+      <input onclick="updateStyle()" type="radio" id="stepped" name="switch" value="stepped" />
+      <label for="stepped">Stepped</label>
+    </div> <br>
+
+            Merge bearing housings: <input id="housing" type="checkbox" onclick="updateHousing()"><br>
+            Include hidden details: <input id="drawing" type="checkbox"><br>
           <input id="reset" class="button-primary" type="button" value="Reset" onclick="reset()">
         </div>
       </div>
