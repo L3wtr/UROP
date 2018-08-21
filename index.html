@@ -13,6 +13,7 @@
 
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.1/p5.js"></script>
+  <script src="https://rawgit.com/processing/p5.js/master/lib/addons/p5.dom.js"></script>
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   
   <!-- Local Scripts -->
@@ -27,6 +28,14 @@
     <div class="row">
       <div class="two-thirds column">
         <div id="model.ID"></div>
+        <div id='myContainer'>
+          <div class="switch-big">
+            <input onclick="updateMode()" type="radio" id="design" name="mode.ID" value="design" checked/>
+            <label for="design">Design Mode</label>
+            <input onclick="updateMode()" type="radio" id="drag" name="mode.ID" value="drag" />
+            <label for="drag">Drag Mode</label>
+          </div>
+        </div>
 
         <div class="selection">
           <h5>Internal Constraints</h5>
@@ -41,10 +50,10 @@
         <div class="options">
           <h5>Options</h5>
             Shaft type:
-            <div class="switch-field">
-              <input onclick="updateStyle()" type="radio" id="straight" name="switch" value="straight" checked/>
+            <div class="switch-small">
+              <input onclick="updateStyle()" type="radio" id="straight" name="shaft.ID" value="straight" checked/>
               <label for="straight">Straight</label>
-              <input onclick="updateStyle()" type="radio" id="stepped" name="switch" value="stepped" />
+              <input onclick="updateStyle()" type="radio" id="stepped" name="shaft.ID" value="stepped" />
               <label for="stepped">Stepped</label>
             </div> <br>
             Merge bearing housings: <input id="housing" type="checkbox" onclick="updateHousing()"><br>
@@ -92,6 +101,3 @@
 </body>
 
 </html>
-
-<!-- ### VC-integrate ###-->
-<!-- initGuidance in js file-->

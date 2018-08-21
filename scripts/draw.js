@@ -16,7 +16,11 @@ function drawBearing(x, stepped) {
   let shapeColour = ['black', 'white'], 
       outline = [2, 0],
       y = [pos.centre.y + (shaft.dia.straight - shaft.dia.stepped)/2 + 42, 
-           pos.centre.y - (shaft.dia.straight - shaft.dia.stepped)/2 - 41];    
+           pos.centre.y - (shaft.dia.straight - shaft.dia.stepped)/2 - 41];
+
+  if (mode == 'drag' && drag.part == 'left' && x < pos.centre.x || drag.part == 'right' && x > pos.centre.x) {
+    x += drag.x;
+  }
 
   noStroke();
   if (stepped) {
@@ -59,13 +63,17 @@ function drawBasicHousing(x, merged) {
 }
 
 /* Draws shaft for stepped and non-stepped modes */
-function drawShaft(stepped) {
+function drawShaft(x, stepped) {
+  if (mode == 'drag' && drag.part == 'shaft') {
+    x += drag.x;
+  }
+
   if (stepped) {
-    rect(pos.centre.x, pos.centre.y, shaft.dim.x, shaft.dia.stepped, 3, 3, 3, 3);
-    rect(pos.centre.x - canvas.dim.x * 0.1 - 12.5, pos.centre.y, canvas.dim.x * 0.7 - 25, shaft.dia.straight, 3, 3, 3, 3);
+    rect(x, pos.centre.y, shaft.dim.x, shaft.dia.stepped, 3, 3, 3, 3);
+    rect(x - canvas.dim.x * 0.1 - 12.5, pos.centre.y, canvas.dim.x * 0.7 - 25, shaft.dia.straight, 3, 3, 3, 3);
   }
   else {
-    rect(pos.centre.x, pos.centre.y, shaft.dim.x, shaft.dia.straight, 3, 3, 3, 3);
+    rect(x, pos.centre.y, shaft.dim.x, shaft.dia.straight, 3, 3, 3, 3);
   }
 }
 

@@ -24,7 +24,7 @@ class Default {
         break
         case 'shaft':
           updateRender = function() {
-            drawShaft(basic.stepped);
+            drawShaft(pos.centre.x, basic.stepped);
           }
         break
         case 'line':
@@ -97,11 +97,11 @@ class Constraint {
             let stateIndex = 0;
             if (location > 3) {
               stateIndex = 4;
-              if (!mergeAlert && !basic.merged) {
+              if (!flag.alert && !basic.merged) {
                 if (confirm('This will merge the bearing housings. Do you wish to continue?')) {
                   basic.merged = true;
                   document.getElementById('housing').checked = true;
-                  mergeAlert = true;
+                  flag.alert = true;
                 }
                 else {
                   removeConstraint('spacer', [5, 6]);
@@ -162,8 +162,11 @@ class Constraint {
     this.highlight = function() {
       if (state[location] == 'empty') {
         [redRGB, rate] = highlightConstraint([redRGB, rate], updatePreview);
-        if (held && updatePreview()) {
-          if (checkHover(updatePosition())) {
+        if(checkHover(updatePosition(), true)) {
+          flag.hand = true;
+        }
+        if (flag.held && updatePreview()) {
+          if (checkHover(updatePosition(), false)) {
             design.run[location] = this;
             state[location] = type;
           }
@@ -218,10 +221,7 @@ function setup() {
   rectMode(CENTER);
   ellipseMode(CENTER);
 
-  held = false;
-  mergeAlert = false;
   state = [];
-
   design = [];
   design.default = [], design.run = [];
   typeName = ['circlip', 'collar', 'spacer', 'shoulder'];
@@ -233,32 +233,62 @@ function setup() {
     }
   }
 
+  mode = 'design';
+  flag = {
+    held: false,
+    hand: false,
+    press: false,
+    alert: false,
+  };
+  drag = {
+    hover: false,
+    origin: 0,
+    x: 0,
+    part: undefined,
+  };
+
   initialise();
   reset();
 }
 
 /* Draw function loops indefinitely following setup */
 function draw() {
+  // Default model
   background(240, 240, 255);
-
   for (let i=0; i<basic.layer.length; i++) {
     design.default[i].render();
   }
-
   for (let i=0; i<design.run.length; i++) {
     if (design.run[i] != undefined) {
       design.run[i].render();
     }
   }
 
-  for (let i=0; i<design.runHighlight.length; i++) {
-    design.runHighlight[i].highlight();
+  // Model modes
+  switch (mode) {
+    case 'design':
+      for (let i=0; i<design.runHighlight.length; i++) {
+        design.runHighlight[i].highlight();
+      }
+    break
+    case 'drag':
+      dragPosition();
+    break
   }
 
-  if (held) {
-    held = false;
+  // Mouse click and hover checks
+  if (flag.held) {
+    flag.held = false;
+  }
+  if (flag.hand) {
+    flag.hand = false;
+    cursor(HAND);
+  }
+  else {
+    cursor(ARROW);
   }
 
+  // Update user information
   updateBearingTable();
 }
 
@@ -304,9 +334,16 @@ function feature(type) {
   }
 }
 
+/* Updates model mode */
+function updateMode() {
+  let modeCheck = document.querySelector('input[name="mode.ID"]:checked').value;
+  mode = modeCheck;
+  design.runHighlight = []
+}
+
 /* Updates the chosen shaft style */
 function updateStyle() {
-  let stepCheck = document.querySelector('input[name="switch"]:checked').value;
+  let stepCheck = document.querySelector('input[name="shaft.ID"]:checked').value;
   if (stepCheck == 'stepped') {
     basic.stepped = true;
     removeConstraint('collar', [1, 3]);
@@ -335,7 +372,7 @@ function updateHousing() {
   }
   else {
     basic.merged = false;
-    mergeAlert = false;
+    flag.alert = false;
     removeConstraint('spacer', [5, 6]);
   }
 
@@ -358,16 +395,32 @@ function removeConstraint(type, locations) {
 
 /* p5 function that triggers when the mouse is pressed and released */
 function mouseClicked() {
-  held = true;
+  flag.held = true;
+  drag.x = 0;
+}
+
+/* p5 function that triggers when the mouse is pressed */
+function mousePressed() {
+  drag.origin = mouseX;
+  flag.press = true;
+}
+
+/* p5 function that triggers when the mouse is dragged */
+function mouseDragged() {
+  if (mode == 'drag' && drag.hover) {
+    drag.x = mouseX - drag.origin;
+  }
 }
 
 /* Returns true if the mouse is within the position object parameters */
-function checkHover(position) {
+function checkHover(position, pointer) {
   let margin = 5;
   if (mouseX > position.x - position.long/2 - margin && mouseX < position.x + position.long/2 + margin &&
         mouseY > pos.centre.y - position.shift - position.high/2 - margin &&
           mouseY < pos.centre.y + position.shift + position.high/2 + margin) {
-    held = false;
+    if (!pointer) {
+      flag.held = false;
+    }
     return true;
   }
 }
@@ -378,8 +431,36 @@ function highlightConstraint(colour, preview) {
   fill(255, colour[0] += colour[1], 45, 150);
   preview();
   stroke('black');
+
   if (colour[0] >= 255 || colour[0] <= 45) {
     colour[1] *= -1;
   }
   return colour;
+}
+
+/* Returns the relevant component (part) corresponding to the drag x-coordinate */
+function dragPosition() {
+  let part = ['shaft', 'right', 'shaft', 'left'];
+  let selected = [checkHover({x: pos.centre.x + drag.x, shift: -5, long: shaft.dim.x, high: shaft.dia.stepped}, true),
+                  checkHover({x: pos.offset.right + drag.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true),
+                  checkHover({x: pos.centre.x - canvas.dim.x * 0.1 - 12.5 + drag.x, shift: -5, long: canvas.dim.x * 0.7 - 25, high: shaft.dia.straight}, true),
+                  checkHover({x: pos.offset.left + drag.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true)];
+  if (basic.stepped) {
+    selected[1] = checkHover({x: pos.offset.right + drag.x, shift: shaft.dia.straight/2 + 14, long: 50.5, high: 60}, true);
+  }                  
+
+  for (let i=0; i<selected.length; i++) {
+    if (selected[i]) {
+      flag.hand = true;
+      if (flag.press) {
+        drag.hover = true;
+        drag.part = part[i];
+        break;
+      }
+    }
+    drag.hover = false;
+  }
+  if (!drag.hover) {
+    flag.press = false;
+  }
 }

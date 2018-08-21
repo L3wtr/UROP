@@ -5,10 +5,20 @@ function updateBearingTable() {
   for (let i=0; i<8; i++) {
     if (i%2 == 0 && state[i] != 'empty') { // i = 0, 2, 4, 6
       index = i/2;
+      if (state[i] == 'spacer') {
+        if (!(state[i-2] != 'empty' && state[i+1] != 'empty')) {
+          count[index] --;
+        }
+      }
       count[index] ++;
     }
     else if (i%2 != 0 && state[i] != 'empty') { // i = 1, 3, 5, 7
       index = (i-1)/2;
+      if (state[i] == 'spacer') {
+        if (!(state[i-1] != 'empty' && state[i+2] != 'empty')) {
+          count[index] --;
+        }
+      }
       count[index] ++;
     }
 
@@ -19,7 +29,7 @@ function updateBearingTable() {
     for (let i=0; i<count.length; i++) {
       bearingCount[i].textContent = conString[i] + '/2';
     }
-  }    
+  }
     
   // Update bearing condition
   let condition = ['Floating', 'Undetermined', 'Fixed'],
