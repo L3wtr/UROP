@@ -169,6 +169,7 @@ class Constraint {
           if (checkHover(updatePosition(), false)) {
             design.run[location] = this;
             state[location] = type;
+            flag.warning = true;
           }
         }
       }
@@ -214,6 +215,8 @@ function setup() {
   basic = {
     stepped: false,
     merged: false,
+    message: 'null',
+    assembly: ['null', 'null', 'null', 'null'],
     layer: ['back', 'bearing', 'housing', 'shaft', 'line'],
   };
 
@@ -239,6 +242,7 @@ function setup() {
     hand: false,
     press: false,
     alert: false,
+    warning: true,
   };
   drag = {
     hover: false,
@@ -254,7 +258,13 @@ function setup() {
 /* Draw function loops indefinitely following setup */
 function draw() {
   // Default model
-  background(240, 240, 255);
+  if (mode == 'design') {
+    background(240, 240, 255);
+  }
+  else {
+    background(230, 250, 250);
+  }
+
   for (let i=0; i<basic.layer.length; i++) {
     design.default[i].render();
   }
@@ -290,6 +300,7 @@ function draw() {
 
   // Update user information
   updateBearingTable();
+  updateAssembly();
 }
 
 /* Initialises design models with latest parameters */
@@ -307,6 +318,12 @@ function reset() {
     state[i] = 'empty';
   }
   updateStyle();
+
+  // Reset warnings
+  basic.message = 'null';
+  basic.assembly = ['null', 'null', 'null', 'null'];
+  removeWarning('all');
+  flag.warning = true;
 }
 
 /* Assigns constraint type */
@@ -450,7 +467,7 @@ function dragPosition() {
   }                  
 
   for (let i=0; i<selected.length; i++) {
-    if (selected[i]) {
+   if (selected[i]) {
       flag.hand = true;
       if (flag.press) {
         drag.hover = true;
@@ -459,6 +476,7 @@ function dragPosition() {
       }
     }
     drag.hover = false;
+    drag.part = undefined;
   }
   if (!drag.hover) {
     flag.press = false;

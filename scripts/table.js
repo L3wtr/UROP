@@ -42,27 +42,113 @@ function updateBearingTable() {
   // Update constraint status
   let countSum = count.reduce((total, amount) => total + amount);
   let status = document.getElementById('status'),
-      box = document.getElementById("round-box");
+      box = document.getElementById('round-box');
 
-  for (let i = 0; i<count.length; i++) {
-    if (countSum < 6 ){
-      status.textContent = 'Under Constrained';
-      box.style.backgroundColor = "#ffcccc";
-    }
-    else if (countSum > 6) {
-      status.textContent = 'Over Constrained';
-      box.style.backgroundColor = "#ffcccc";
-    }
-    else {
-      if(count[i] == 0) {
-        status.textContent = 'Adequately Constrained';
-        box.style.backgroundColor = "#ccffcc";
-        break;
+  if (flag.warning) {
+    for (let i = 0; i<count.length; i++) {
+      if (countSum < 6 ) {
+        warningBox('constraint', 'The system is under constrained.');
+      }
+      else if (countSum > 6) {
+        warningBox('constraint', 'The system is over constrained.');
       }
       else {
-        status.textContent = 'Inadequately Constrained';
-        box.style.backgroundColor = "#ffffcc";
-      }       
+        removeWarning('constraint');
+      }
     }
+    flag.warning = false;
   }
 }
+
+/* Warns users of possible assembly errors */
+function updateAssembly() {
+  for (let i=0; i<4; i++) { // i = 0, 1, 2, 3
+    if (!basic.stepped && ((state[0] == 'collar'&& state[3] =='collar' ) || (state [i] == 'collar' && state[i+2] == 'collar') ||
+        (i%2 == 0 && state[i] == 'collar' && state[i+1] =='collar'))) {
+      warningBox('shaft', 'Bearings cannot be assembled with the shaft.');
+    }
+  }
+
+  if (basic.merged) {
+    for (let i=4; i<8; i++) { // i = 4, 5, 6, 7
+      if ((state[4] == 'shoulder'&& state[7] =='shoulder' ) || (state [i] == 'shoulder' && state[i+2] == 'shoulder') ||
+          (i%2 == 0 && state[i] == 'shoulder' && state[i+1] =='shoulder')) {
+        warningBox('merged', 'Bearings cannot be assembled with the housing.');
+      }
+    }
+  }
+  else {
+    if(state[4] == 'shoulder' && state[5] =='shoulder') {
+      warningBox('left', 'Bearings cannot be assembled with the left housing.');
+    }
+    if (state[6] == 'shoulder' && state[7] =='shoulder') {
+      warningBox('right', 'Bearings cannot be assembled with the right housing.');
+    }
+  }  
+}
+
+/* Appends warning boxes to the index page using JQuery */
+function warningBox(type, message) {
+  let warning = $('<div class="round-box"><b>Warning: </b>' + message + '</div>').hide(0).delay(200).show(400);
+  warning.css('backgroundColor', '#ffcccc');
+  $(warning).addClass(type);
+
+  switch (type) {
+    case 'constraint': 
+      if (message != basic.message) {
+        basic.message = message;
+        $('.constraint').hide(400);
+        $('#bearing-table').after(warning);
+      }
+    break 
+    case 'shaft':
+      if (type != basic.assembly[0]) {
+        $('#bearing-table').after(warning);
+        basic.assembly[0] = type;
+      }
+    break
+    case 'merged':
+      if (type != basic.assembly[1]) {
+        $('.right').hide(400);
+        $('.left').hide(400);
+        $('#bearing-table').after(warning);
+        basic.assembly[1] = type;
+      }
+    break
+    case 'left':
+      if (type != basic.assembly[2]) {
+        $('#bearing-table').after(warning);
+        basic.assembly[2] = type;
+      }
+    break
+    case 'right':
+      if (type != basic.assembly[3]) {
+        $('#bearing-table').after(warning);
+        basic.assembly[3] = type;
+      }
+    break 
+  }
+}
+
+/* Removes specified JQuery warning boxes */
+function removeWarning(type) {
+  if (type == 'all') {
+    $('.round-box').hide(400);
+  }
+  else {
+    $('.' + type).hide(400);
+  }
+}
+
+/* ### THINGS TO WORK ON ###
+
+  # Improve the warningBox function:
+  Reduce reliance on switch and reduce repetition of code
+
+  # Improve the update functions:
+  Try to avoid using for loops with i, while reducing repetition of code
+
+  # Fix overall constraint warning:
+  Add more sophisticated cases for total number of constraints = 6
+
+*/
