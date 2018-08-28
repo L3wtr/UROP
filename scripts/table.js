@@ -3,22 +3,12 @@ function updateBearingTable() {
   let count = [0, 0, 0, 0],
       index;             
   for (let i=0; i<8; i++) {
-    if (i%2 == 0 && state[i] != 'empty') { // i = 0, 2, 4, 6
+    if (i%2 == 0 && con.state[i]) { // i = 0, 2, 4, 6
       index = i/2;
-      if (state[i] == 'spacer') {
-        if (!(state[i-2] != 'empty' && state[i+1] != 'empty')) {
-          count[index] --;
-        }
-      }
       count[index] ++;
     }
-    else if (i%2 != 0 && state[i] != 'empty') { // i = 1, 3, 5, 7
+    else if (i%2 != 0 && con.state[i]) { // i = 1, 3, 5, 7
       index = (i-1)/2;
-      if (state[i] == 'spacer') {
-        if (!(state[i-1] != 'empty' && state[i+2] != 'empty')) {
-          count[index] --;
-        }
-      }
       count[index] ++;
     }
 
@@ -63,25 +53,25 @@ function updateBearingTable() {
 /* Warns users of possible assembly errors */
 function updateAssembly() {
   for (let i=0; i<4; i++) { // i = 0, 1, 2, 3
-    if (!basic.stepped && ((state[0] == 'collar'&& state[3] =='collar' ) || (state [i] == 'collar' && state[i+2] == 'collar') ||
-        (i%2 == 0 && state[i] == 'collar' && state[i+1] =='collar'))) {
+    if (!basic.stepped && ((con.tag[0] == 'collar'&& con.tag[3] =='collar' ) || (con.tag [i] == 'collar' && con.tag[i+2] == 'collar') ||
+        (i%2 == 0 && con.tag[i] == 'collar' && con.tag[i+1] =='collar'))) {
       warningBox('shaft', 'Bearings cannot be assembled with the shaft.');
     }
   }
 
   if (basic.merged) {
     for (let i=4; i<8; i++) { // i = 4, 5, 6, 7
-      if ((state[4] == 'shoulder'&& state[7] =='shoulder' ) || (state [i] == 'shoulder' && state[i+2] == 'shoulder') ||
-          (i%2 == 0 && state[i] == 'shoulder' && state[i+1] =='shoulder')) {
+      if ((con.tag[4] == 'shoulder'&& con.tag[7] =='shoulder' ) || (con.tag [i] == 'shoulder' && con.tag[i+2] == 'shoulder') ||
+          (i%2 == 0 && con.tag[i] == 'shoulder' && con.tag[i+1] =='shoulder')) {
         warningBox('merged', 'Bearings cannot be assembled with the housing.');
       }
     }
   }
   else {
-    if(state[4] == 'shoulder' && state[5] =='shoulder') {
+    if(con.tag[4] == 'shoulder' && con.tag[5] =='shoulder') {
       warningBox('left', 'Bearings cannot be assembled with the left housing.');
     }
-    if (state[6] == 'shoulder' && state[7] =='shoulder') {
+    if (con.tag[6] == 'shoulder' && con.tag[7] =='shoulder') {
       warningBox('right', 'Bearings cannot be assembled with the right housing.');
     }
   }  

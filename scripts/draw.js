@@ -18,8 +18,11 @@ function drawBearing(x, stepped) {
       y = [pos.centre.y + (shaft.dia.straight - shaft.dia.stepped)/2 + 42, 
            pos.centre.y - (shaft.dia.straight - shaft.dia.stepped)/2 - 41];
 
-  if (mode == 'drag' && drag.part == 'left' && x < pos.centre.x || drag.part == 'right' && x > pos.centre.x) {
-    x += drag.x;
+  if (x < pos.centre.x) {
+    x = constraintLogic(x, 'leftBearing');
+  }
+  else if (x > pos.centre.x) {
+    x = constraintLogic(x, 'rightBearing');
   }
 
   noStroke();
@@ -64,9 +67,7 @@ function drawBasicHousing(x, merged) {
 
 /* Draws shaft for stepped and non-stepped modes */
 function drawShaft(x, stepped) {
-  if (mode == 'drag' && drag.part == 'shaft') {
-    x += drag.x;
-  }
+  x = constraintLogic(x, 'shaft');
 
   if (stepped) {
     rect(x, pos.centre.y, shaft.dim.x, shaft.dia.stepped, 3, 3, 3, 3);
@@ -96,6 +97,8 @@ function drawCirclip(location, stepped, returnPosition) {
   let x = [pos.offset.left - 24, pos.offset.left + 24, pos.offset.right - 24, pos.offset.right + 24],
       shift = shaft.dia.straight/2;
 
+  x[location] = constraintLogic(x[location], 'shaft');
+
   if (location == 3 && stepped) {
     shift -= (shaft.dia.straight - shaft.dia.stepped)/2; 
   }
@@ -124,6 +127,8 @@ function drawCollar(location, common, returnPosition) {
   let length = canvas.dim.x * 0.2 - 20,
       x = [pos.offset.left - 20.5 - length/2, pos.offset.left + 20.5 + length/2,
            pos.offset.right - 20.5 - length/2, pos.offset.right + 20.5 + length/2];
+
+  x[location] = constraintLogic(x[location], 'shaft');
 
   if (common) {
     x[location] = pos.centre.x;

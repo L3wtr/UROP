@@ -1,5 +1,5 @@
-/* Default class to render the bearing-shaft arrangement */
-class Default {
+/* Base class to render the bearing-shaft arrangement */
+class Base {
   constructor(layer) {
     let updateRender = function() {};
 
@@ -75,7 +75,7 @@ class Constraint {
         case 'collar':
           updateRender = function() {
             fill('white');
-            if ((location == 1 && state[2] == 'collar') || (location == 2 && state[1] == 'collar')) {
+            if ((location == 1 && con.tag[2] == 'collar') || (location == 2 && con.tag[1] == 'collar')) {
               drawCollar(location, true);
             }
             else {
@@ -94,32 +94,25 @@ class Constraint {
         break
         case 'spacer':
           updateRender = function() {
-            let stateIndex = 0;
             if (location > 3) {
-              stateIndex = 4;
               if (!flag.alert && !basic.merged) {
                 if (confirm('This will merge the bearing housings. Do you wish to continue?')) {
-                  basic.merged = true;
                   document.getElementById('housing').checked = true;
+                  basic.merged = true;
                   flag.alert = true;
                 }
                 else {
-                  removeConstraint('spacer', [5, 6]);
+                  removeConstraint(type, [5, 6]);
                 }
               }
             }
             if (basic.merged || location < 3) {
               fill(100, 100, 100);
               drawSpacer(location, basic.stepped);
-              state[2 + stateIndex] = 'spacer';
             }
           }
           updatePreview = function() {
-            let stateIndex = 0;
-            if (location > 3) {
-              stateIndex = 4;
-            } 
-            if(state[1 + stateIndex] == 'empty' && state[2 + stateIndex] == 'empty') {
+            if(con.tag[location] == 'empty' && con.tag[location + 1] == 'empty') {
               drawSpacer(location, basic.stepped)
               return true;
             }
@@ -132,7 +125,7 @@ class Constraint {
           updateRender = function() {
             fill(200, 200, 200)
 
-            if (((location == 5 && state[6] == 'shoulder') || (location == 6 && state[5] == 'shoulder')) && basic.merged) {
+            if (((location == 5 && con.tag[6] == 'shoulder') || (location == 6 && con.tag[5] == 'shoulder')) && basic.merged) {
               drawCustomHousing(location, basic.stepped, true);
             }
             else {
@@ -160,15 +153,15 @@ class Constraint {
     }
 
     this.highlight = function() {
-      if (state[location] == 'empty') {
-        [redRGB, rate] = highlightConstraint([redRGB, rate], updatePreview);
+      if (con.tag[location] == 'empty') {
+        [redRGB, rate] = highlightPreview([redRGB, rate], updatePreview);
         if(checkHover(updatePosition(), true)) {
           flag.hand = true;
         }
         if (flag.held && updatePreview()) {
           if (checkHover(updatePosition(), false)) {
+            updateConstraint(type, location);
             design.run[location] = this;
-            state[location] = type;
             flag.warning = true;
           }
         }
@@ -176,6 +169,96 @@ class Constraint {
     }
   }
 }
+
+/* Drag class to render the dragged components */
+class Drag {
+  constructor(part) {
+    let hover = function() {},
+        direction = function() {};
+    let face = [false, false]; // Defines which sides of each part are constrained; [left, right]
+
+    this.init = function() {
+      switch (part) {
+        case 'shaft':
+          hover = function() {
+            let isHovering = false; // Returns true if any of the hover conditions are met
+            if (basic.stepped) {
+              isHovering = checkHover({x: pos.centre.x + move.x, shift: -5, long: shaft.dim.x, high: shaft.dia.stepped}, true);
+              if (!isHovering) {
+                isHovering = checkHover({x: pos.centre.x - canvas.dim.x * 0.1 - 12.5 + move.x, shift: -5, long: canvas.dim.x * 0.7 - 25, high: shaft.dia.straight}, true);
+              }            
+            }
+            else {
+              isHovering = checkHover({x: pos.centre.x + move.x, shift: -5, long: shaft.dim.x, high: shaft.dia.straight}, true);
+            }
+            return isHovering;
+          }
+          direction = function(x) {
+            let sign = 1;
+            for (let i=0; i<4; i++) {
+              if (con.state[i] && con.state[4+i+sign] && sign*move.x > 0) {
+                return x;
+              }
+              sign *= -1;
+            }
+            return x + move.x;
+          }
+        break
+        case 'leftBearing':
+          hover = function() {
+            return checkHover({x: pos.offset.left + move.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true, true);
+          }
+          direction = function(x) {
+            let sign = 1;
+            for (let i=0; i<2; i++) {
+              if (!con.state[4+i] && sign*move.x < 0) {
+                x += move.x;
+              }
+              sign *= -1;
+            }
+            return x;
+          }
+        break
+        case 'rightBearing':
+          hover = function() {
+            if (basic.stepped) {
+              return checkHover({x: pos.offset.right + move.x, shift: shaft.dia.straight/2 + 14, long: 50.5, high: 60}, true, true);
+            }
+            else {
+              return checkHover({x: pos.offset.right + move.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true, true);
+            } 
+          }
+          direction = function (x) {
+            let sign = 1;
+            for (let i=0; i<2; i++) {
+              if (!con.state[6+i] && sign*move.x < 0) {
+                x += move.x;
+              }
+              sign *= -1;
+            }
+            return x;
+          }
+        break 
+      }
+    }
+    this.init();
+
+    this.selected = function() {
+      if (hover()) {
+        flag.hand = true;
+        this.part = true;
+      }
+      else {
+        this.part = false;
+      }
+    }
+
+    this.drawX = function(x) {
+      return direction(x);
+    }
+  }
+}
+
 
 /* Setup function runs once on startup */
 function setup() {
@@ -198,7 +281,6 @@ function setup() {
       stepped: 38,
     },
   };
-
   pos = {
     centre: {
       x: canvas.dim.x * 0.5,
@@ -212,22 +294,25 @@ function setup() {
     },
   };
 
-  basic = {
-    stepped: false,
-    merged: false,
-    message: 'null',
-    assembly: ['null', 'null', 'null', 'null'],
-    layer: ['back', 'bearing', 'housing', 'shaft', 'line'],
-  };
-
   // Initialising model
   rectMode(CENTER);
   ellipseMode(CENTER);
 
-  state = [];
+  basic = {
+    stepped: false,
+    merged: false,
+    message: undefined,
+    assembly: [],
+    layer: ['back', 'bearing', 'housing', 'shaft', 'line'],
+  };
+  con = { // Constraint status (tag defines the type of constraint; state defines the constrained status)
+    tag: [],
+    state: [],
+  };
+
   design = [];
-  design.default = [], design.run = [];
-  typeName = ['circlip', 'collar', 'spacer', 'shoulder'];
+  design.base = [], design.run = [];
+  typeName = ['circlip', 'collar', 'spacer', 'shoulder']; // Constraint types
 
   for (let i=0; i<typeName.length; i++) {
     design[typeName[i]] = [];
@@ -235,29 +320,37 @@ function setup() {
       design[typeName[i]][j] = new Constraint(typeName[i], j);
     }
   }
+  for (let i=0; i<basic.layer.length; i++) {
+    design.base[i] = new Base(i);
+  }
 
   mode = 'design';
   flag = {
     held: false,
     hand: false,
-    press: false,
-    alert: false,
-    warning: true,
+    motion: false, // Drag mode flag: if true, update move coordinates to allow drag motion
+    alert: false, // Merge alert flag: if true, hide merge housing warning
+    warning: true, // User warning flag: if true, update warning boxes
   };
-  drag = {
-    hover: false,
+  move = {
     origin: 0,
     x: 0,
-    part: undefined,
   };
 
-  initialise();
+  design.motion = undefined;
+  design.drag = [];
+  partName = ['shaft', 'leftBearing', 'rightBearing'];
+
+  for (let i=0; i<partName.length; i++) {
+    design.drag[i] = new Drag(partName[i]);
+  }
+
   reset();
 }
 
 /* Draw function loops indefinitely following setup */
 function draw() {
-  // Default model
+  // Base model
   if (mode == 'design') {
     background(240, 240, 255);
   }
@@ -266,7 +359,7 @@ function draw() {
   }
 
   for (let i=0; i<basic.layer.length; i++) {
-    design.default[i].render();
+    design.base[i].render();
   }
   for (let i=0; i<design.run.length; i++) {
     if (design.run[i] != undefined) {
@@ -282,7 +375,9 @@ function draw() {
       }
     break
     case 'drag':
-      dragPosition();
+      for (let i=0; i<design.drag.length; i++) {
+        design.drag[i].selected();
+      }
     break
   }
 
@@ -303,25 +398,18 @@ function draw() {
   updateAssembly();
 }
 
-/* Initialises design models with latest parameters */
-function initialise() {
-  for (let i=0; i<basic.layer.length; i++) {
-    design.default[i] = new Default(i);
-  }
-}
-
 /* Resets design model */
 function reset() {
   design.run = [];
   design.runHighlight = [];
   for (let i =0; i<8; i++) {
-    state[i] = 'empty';
+    updateConstraint('empty', i);
   }
   updateStyle();
 
   // Reset warnings
-  basic.message = 'null';
-  basic.assembly = ['null', 'null', 'null', 'null'];
+  basic.message = undefined;
+  basic.assembly = [];
   removeWarning('all');
   flag.warning = true;
 }
@@ -363,14 +451,14 @@ function updateStyle() {
   let stepCheck = document.querySelector('input[name="shaft.ID"]:checked').value;
   if (stepCheck == 'stepped') {
     basic.stepped = true;
-    removeConstraint('collar', [1, 3]);
-    removeConstraint('spacer', [1]);
-    removeConstraint('all', [2]);
-    state[2] = 'collar';
+    removeConstraint('collar', [1, 2, 3]);
+    removeConstraint('spacer', [1, 2]);
+    removeConstraint('all', 2);
+    updateConstraint('collar', 2);
   }
   else {
     basic.stepped = false;
-    state[2] = 'empty';
+    updateConstraint('empty', 2)
   }
   
   for (let i=0; i<typeName.length; i++) {
@@ -378,7 +466,6 @@ function updateStyle() {
       design[typeName[i]][j].resetHighlight();
     }
   }
-  initialise();
 }
 
 /* Updates bearing housing (merged or unmerged) */
@@ -400,37 +487,26 @@ function updateHousing() {
   }
 }
 
-/* Removes a constraint at a given array of locations */ 
-function removeConstraint(type, locations) {
-  for (let i=0; i<locations.length; i++) {
-    if (type == 'all' || state[locations[i]] == type) {
-      state[locations[i]] = 'empty';
-      design.run[locations[i]] = undefined;
-    }
-  }
-}
-
 /* p5 function that triggers when the mouse is pressed and released */
 function mouseClicked() {
   flag.held = true;
-  drag.x = 0;
+  move.x = 0;
 }
 
 /* p5 function that triggers when the mouse is pressed */
 function mousePressed() {
-  drag.origin = mouseX;
-  flag.press = true;
+  move.origin = mouseX;
 }
 
 /* p5 function that triggers when the mouse is dragged */
 function mouseDragged() {
-  if (mode == 'drag' && drag.hover) {
-    drag.x = mouseX - drag.origin;
+  if (mode == 'drag') {
+    move.x = mouseX - move.origin;
   }
 }
 
 /* Returns true if the mouse is within the position object parameters */
-function checkHover(position, pointer) {
+function checkHover(position, pointer, inner) {
   let margin = 5;
   if (mouseX > position.x - position.long/2 - margin && mouseX < position.x + position.long/2 + margin &&
         mouseY > pos.centre.y - position.shift - position.high/2 - margin &&
@@ -438,12 +514,56 @@ function checkHover(position, pointer) {
     if (!pointer) {
       flag.held = false;
     }
-    return true;
+    if (inner) { // ### NEEDS WORK ###
+      if ((mouseY < pos.centre.y - position.shift + position.high/2 && mouseY > pos.centre.y - position.shift - position.high/2) ||
+            (mouseY > pos.centre.y + position.shift - position.high/2 && mouseY < pos.centre.y + position.shift + position.high/2) ) {
+        return true;
+      }
+    }
+    else {
+      return true;
+    }
   }
 }
 
-/* Updates constraint highlight colour */
-function highlightConstraint(colour, preview) {
+/* Update the constraint status of a constraint type */
+function updateConstraint(type, location) {
+  con.tag[location] = type;
+  if (type == 'spacer') {
+    con.tag[location + 1] = type;
+  }
+
+  if (type == 'empty' || type == 'spacer') {
+    con.state[location] = false;
+  }
+  else {
+    con.state[location] = true;
+  }
+
+  [1, 5].forEach(function(i) {
+    if (con.state[i-1] && con.state[i+2] && con.tag[i] == 'spacer') {
+      con.state[i] = true;
+      con.state[i+1] = true;
+    }
+  });
+}
+
+/* Removes a constraint at a given location */ 
+function removeConstraint(type, location) {
+  if (location.constructor !== Array ) {
+    location = [location];
+  }
+
+  for (let i=0; i<location.length; i++) {
+    if (type == 'all' || con.tag[location[i]] == type) {
+      updateConstraint('empty', location[i]);
+      design.run[location[i]] = undefined;
+    }
+  }
+}
+
+/* Updates constraint preview highlight colour */
+function highlightPreview(colour, preview) {
   stroke('red');
   fill(255, colour[0] += colour[1], 45, 150);
   preview();
@@ -455,30 +575,20 @@ function highlightConstraint(colour, preview) {
   return colour;
 }
 
-/* Returns the relevant component (part) corresponding to the drag x-coordinate */
-function dragPosition() {
-  let part = ['shaft', 'right', 'shaft', 'left'];
-  let selected = [checkHover({x: pos.centre.x + drag.x, shift: -5, long: shaft.dim.x, high: shaft.dia.stepped}, true),
-                  checkHover({x: pos.offset.right + drag.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true),
-                  checkHover({x: pos.centre.x - canvas.dim.x * 0.1 - 12.5 + drag.x, shift: -5, long: canvas.dim.x * 0.7 - 25, high: shaft.dia.straight}, true),
-                  checkHover({x: pos.offset.left + drag.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true)];
-  if (basic.stepped) {
-    selected[1] = checkHover({x: pos.offset.right + drag.x, shift: shaft.dia.straight/2 + 14, long: 50.5, high: 60}, true);
-  }                  
-
-  for (let i=0; i<selected.length; i++) {
-   if (selected[i]) {
-      flag.hand = true;
-      if (flag.press) {
-        drag.hover = true;
-        drag.part = part[i];
-        break;
+/* Determines the constraint drag logic and returns the relevant x coordinate */
+function constraintLogic(x, part) {
+  let limits = [0, 4, 0, 2, 2, 4];
+  let sign = 1;
+  for (let i=limits[2*partName.indexOf(part)]; i<limits[2*partName.indexOf(part)+1]; i++) {
+    if (con.state[i] && sign*move.x > 0) {
+      return design.drag[partName.indexOf('shaft')].drawX(x); 
+    }
+    else {
+      if (design.drag[partName.indexOf(part)].part){
+        return design.drag[partName.indexOf(part)].drawX(x); 
       }
     }
-    drag.hover = false;
-    drag.part = undefined;
+    sign *= -1;
   }
-  if (!drag.hover) {
-    flag.press = false;
-  }
+  return x;
 }
