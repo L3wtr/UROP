@@ -148,21 +148,23 @@ function drawCollar(location, common, returnPosition) {
 /* Draws spacer at locations 1 or 5 */
 function drawSpacer(location, stepped, returnPosition) {
   let shift = shaft.dia.straight/2 + 7.5,
+      x = pos.centre.x,
       step = 0;
 
   if (location > 3) {
     shift += 30;
     if (stepped) {
       step = 4.5;
+      x -= step/2;
     }
   }
 
   if (returnPosition) {
-    return {x: pos.centre.x - step/2, shift: shift, long: canvas.dim.x * 0.5 - 41 - step, high: 15};
+    return {x: x, shift: shift, long: canvas.dim.x * 0.5 - 41 - step, high: 15};
   }
   else {
-    rect(pos.centre.x - step/2, pos.centre.y - shift, canvas.dim.x * 0.5 - 41 - step, 15, 2, 2, 2, 2);
-    rect(pos.centre.x - step/2, pos.centre.y + shift, canvas.dim.x * 0.5 - 41 - step, 15, 2, 2, 2, 2);
+    rect(x, pos.centre.y - shift, canvas.dim.x * 0.5 - 41 - step, 15, 2, 2, 2, 2);
+    rect(x, pos.centre.y + shift, canvas.dim.x * 0.5 - 41 - step, 15, 2, 2, 2, 2);
   }
 }
 

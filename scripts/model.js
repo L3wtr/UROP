@@ -374,7 +374,7 @@ function draw() {
         design.runHighlight[i].highlight();
       }
     break
-    case 'drag':
+    case 'test':
       for (let i=0; i<design.drag.length; i++) {
         design.drag[i].selected();
       }
@@ -500,7 +500,7 @@ function mousePressed() {
 
 /* p5 function that triggers when the mouse is dragged */
 function mouseDragged() {
-  if (mode == 'drag') {
+  if (mode == 'test') {
     move.x = mouseX - move.origin;
   }
 }
@@ -514,15 +514,15 @@ function checkHover(position, pointer, inner) {
     if (!pointer) {
       flag.held = false;
     }
-    if (inner) { // ### NEEDS WORK ###
+    /*if (false) { // ### NEEDS WORK ###
       if ((mouseY < pos.centre.y - position.shift + position.high/2 && mouseY > pos.centre.y - position.shift - position.high/2) ||
             (mouseY > pos.centre.y + position.shift - position.high/2 && mouseY < pos.centre.y + position.shift + position.high/2) ) {
         return true;
       }
     }
-    else {
+    else {*/
       return true;
-    }
+    //}
   }
 }
 
@@ -579,16 +579,95 @@ function highlightPreview(colour, preview) {
 function constraintLogic(x, part) {
   let limits = [0, 4, 0, 2, 2, 4];
   let sign = 1;
-  for (let i=limits[2*partName.indexOf(part)]; i<limits[2*partName.indexOf(part)+1]; i++) {
-    if (con.state[i] && sign*move.x > 0) {
-      return design.drag[partName.indexOf('shaft')].drawX(x); 
-    }
-    else {
-      if (design.drag[partName.indexOf(part)].part){
-        return design.drag[partName.indexOf(part)].drawX(x); 
+  let temp = false;
+
+  for (let i=0; i<partName.length; i++) {
+    if (design.drag[i].part) {
+      if (part == 'spacer') {
+
+      }
+      else {
+        for (let j=limits[2*partName.indexOf(part)]; j<limits[2*partName.indexOf(part)+1]; j++) {
+          if (con.state[j] && sign*move.x > 0 && design.drag[partName.indexOf('shaft')].part) {
+            if (j < 2) {
+              if (design.drag[partName.indexOf('leftBearing')].drawX(x) != x) {
+                if ((con.state[0] && con.state[2]) || (con.state[1] && con.state[3])) {
+                  return design.drag[partName.indexOf('rightBearing')].drawX(x);
+                }
+                else {
+                  return design.drag[partName.indexOf('leftBearing')].drawX(x);
+                }
+              }
+              else {
+                return design.drag[partName.indexOf('leftBearing')].drawX(x);
+              }
+            }
+            if (j >= 2) {
+              if (design.drag[partName.indexOf('rightBearing')].drawX(x) != x) {
+                if ((con.state[0] && con.state[2]) || (con.state[1] && con.state[3])) {
+                  return design.drag[partName.indexOf('leftBearing')].drawX(x);
+                }
+                else {
+                  return design.drag[partName.indexOf('rightBearing')].drawX(x);
+                }
+              }
+              else {
+                return design.drag[partName.indexOf('rightBearing')].drawX(x);
+              }
+            }
+          }
+
+          if (con.state[j] && design.drag[partName.indexOf('leftBearing')].part) {
+            if (design.drag[partName.indexOf('leftBearing')].drawX(x) != x) {
+              if (con.state[1] && con.state[2] && move.x > 0) {
+                return design.drag[partName.indexOf('rightBearing')].drawX(x);
+              }
+              if (con.state[0] && con.state[3] && move.x < 0) {
+                return design.drag[partName.indexOf('rightBearing')].drawX(x);
+              }
+            }
+            else {
+              if (con.state[1] && con.state[2] && move.x > 0) {
+                return design.drag[partName.indexOf('leftBearing')].drawX(x);
+              }
+              if (con.state[0] && con.state[3] && move.x < 0) {
+                return design.drag[partName.indexOf('leftBearing')].drawX(x);
+              }
+            }
+            if (j < 2 && sign*move.x < 0) {
+              return design.drag[partName.indexOf('leftBearing')].drawX(x);
+            }
+          }
+
+          if (con.state[j] && design.drag[partName.indexOf('rightBearing')].part) {
+            if (design.drag[partName.indexOf('rightBearing')].drawX(x) != x) {
+              if (con.state[1] && con.state[2] && move.x < 0) {
+                return design.drag[partName.indexOf('leftBearing')].drawX(x);
+              }
+              if (con.state[0] && con.state[3] && move.x > 0) {
+                return design.drag[partName.indexOf('leftBearing')].drawX(x);
+              }
+            }
+            else {
+              if (con.state[1] && con.state[2] && move.x < 0) {
+                return design.drag[partName.indexOf('rightBearing')].drawX(x);
+              }
+              if (con.state[0] && con.state[3] && move.x > 0) {
+                return design.drag[partName.indexOf('rightBearing')].drawX(x);
+              }
+            }
+            if (j >= 2 && sign*move.x < 0) {
+              return design.drag[partName.indexOf('rightBearing')].drawX(x);
+            }
+          }
+
+          sign *= -1;
+        }
+        if (design.drag[partName.indexOf(part)].part) {
+          return design.drag[partName.indexOf(part)].drawX(x); 
+        }
       }
     }
-    sign *= -1;
   }
   return x;
 }
