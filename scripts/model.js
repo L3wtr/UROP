@@ -194,13 +194,6 @@ class Drag {
             return isHovering;
           }
           direction = function(x) {
-            let sign = 1;
-            for (let i=0; i<4; i++) {
-              if (con.state[i] && con.state[4+i+sign] && sign*move.x > 0) {
-                return x;
-              }
-              sign *= -1;
-            }
             return x + move.x;
           }
         break
@@ -540,7 +533,7 @@ function updateConstraint(type, location) {
     con.state[location] = true;
   }
 
-  [1, 5].forEach(function(i) {
+  [1, 5].forEach( function(i) {
     if (con.state[i-1] && con.state[i+2] && con.tag[i] == 'spacer') {
       con.state[i] = true;
       con.state[i+1] = true;
@@ -575,94 +568,76 @@ function highlightPreview(colour, preview) {
   return colour;
 }
 
-/* Determines the constraint drag logic and returns the relevant x coordinate */
-function constraintLogic(x, part) {
+/* Determines the constraint drag logic and returns the relevant x-coordinate */
+function constraintLogic(x, part, spacer) {
   let limits = [0, 4, 0, 2, 2, 4];
   let sign = 1;
-  let temp = false;
 
   for (let i=0; i<partName.length; i++) {
     if (design.drag[i].part) {
-      if (part == 'spacer') {
 
+      // Spacer constraint logic
+      if (con.tag.indexOf('spacer')) {
+        for (let k=-0.5; k<=0.5; k++) {
+          if (k*move.x < 0) {
+            if (design.drag[0].part) { // When shaft is selected
+              if (con.state[3*k + 1.5] && con.state[-3*k + 5.5]) {
+                return design.drag[-k + 1.5].drawX(x);
+              }
+              if (con.state[3*k + 1.5]) {
+                return design.drag[k + 1.5].drawX(x);
+              }
+            }
+            if (design.drag[k + 1.5].part) { // When bearings are selected (left k=-0.5, right k=0.5)
+              if (part != 'shaft' && design.drag[k + 1.5].drawX(x) != x) {
+                return design.drag[-k + 1.5].drawX(x);
+              }
+              if (con.state[-3*k + 1.5] && design.drag[-k + 1.5].drawX(x) != x) {
+                return design.drag[k + 1.5].drawX(x);
+              }
+            }
+          }
+        }
       }
-      else {
+
+      if (!spacer) {
         for (let j=limits[2*partName.indexOf(part)]; j<limits[2*partName.indexOf(part)+1]; j++) {
-          if (con.state[j] && sign*move.x > 0 && design.drag[partName.indexOf('shaft')].part) {
-            if (j < 2) {
-              if (design.drag[partName.indexOf('leftBearing')].drawX(x) != x) {
-                if ((con.state[0] && con.state[2]) || (con.state[1] && con.state[3])) {
-                  return design.drag[partName.indexOf('rightBearing')].drawX(x);
+          // Constraint logic when shaft is selected
+          if ((con.state[j]) && sign*move.x > 0 && design.drag[0].part) {
+            for (let k=-0.5; k<=0.5; k++) {
+              if (k*(j-1.5) > 0) {
+                if (design.drag[k + 1.5].drawX(x) != x) {
+                  if ((con.state[0] && con.state[2]) || (con.state[1] && con.state[3])) {
+                    return design.drag[-k + 1.5].drawX(x);
+                  }
                 }
-                else {
-                  return design.drag[partName.indexOf('leftBearing')].drawX(x);
+                return design.drag[k + 1.5].drawX(x);
+              }
+            } 
+          }
+
+          // Constraint logic when bearings are selected (left k=-0.5, right k=0.5)
+          for (let k=-0.5; k<=0.5; k++) {
+            if ((con.state[j]) && design.drag[k + 1.5].part) {
+              if (design.drag[k + 1.5].drawX(x) != x) {
+                if ((con.state[1] && con.state[2] && k*move.x < 0) || (con.state[0] && con.state[3] && k*move.x > 0)) {
+                  return design.drag[-k + 1.5].drawX(x);
                 }
               }
               else {
-                return design.drag[partName.indexOf('leftBearing')].drawX(x);
-              }
-            }
-            if (j >= 2) {
-              if (design.drag[partName.indexOf('rightBearing')].drawX(x) != x) {
-                if ((con.state[0] && con.state[2]) || (con.state[1] && con.state[3])) {
-                  return design.drag[partName.indexOf('leftBearing')].drawX(x);
-                }
-                else {
-                  return design.drag[partName.indexOf('rightBearing')].drawX(x);
+                if ((con.state[1] && con.state[2] && k*move.x < 0) || (con.state[0] && con.state[3] && k*move.x > 0)) {
+                  return design.drag[k + 1.5].drawX(x);
                 }
               }
-              else {
-                return design.drag[partName.indexOf('rightBearing')].drawX(x);
+              if (con.state[j] && k*(j-1.5) > 0 && sign*move.x < 0) {
+                return design.drag[k + 1.5].drawX(x);
               }
             }
           }
-
-          if (con.state[j] && design.drag[partName.indexOf('leftBearing')].part) {
-            if (design.drag[partName.indexOf('leftBearing')].drawX(x) != x) {
-              if (con.state[1] && con.state[2] && move.x > 0) {
-                return design.drag[partName.indexOf('rightBearing')].drawX(x);
-              }
-              if (con.state[0] && con.state[3] && move.x < 0) {
-                return design.drag[partName.indexOf('rightBearing')].drawX(x);
-              }
-            }
-            else {
-              if (con.state[1] && con.state[2] && move.x > 0) {
-                return design.drag[partName.indexOf('leftBearing')].drawX(x);
-              }
-              if (con.state[0] && con.state[3] && move.x < 0) {
-                return design.drag[partName.indexOf('leftBearing')].drawX(x);
-              }
-            }
-            if (j < 2 && sign*move.x < 0) {
-              return design.drag[partName.indexOf('leftBearing')].drawX(x);
-            }
-          }
-
-          if (con.state[j] && design.drag[partName.indexOf('rightBearing')].part) {
-            if (design.drag[partName.indexOf('rightBearing')].drawX(x) != x) {
-              if (con.state[1] && con.state[2] && move.x < 0) {
-                return design.drag[partName.indexOf('leftBearing')].drawX(x);
-              }
-              if (con.state[0] && con.state[3] && move.x > 0) {
-                return design.drag[partName.indexOf('leftBearing')].drawX(x);
-              }
-            }
-            else {
-              if (con.state[1] && con.state[2] && move.x < 0) {
-                return design.drag[partName.indexOf('rightBearing')].drawX(x);
-              }
-              if (con.state[0] && con.state[3] && move.x > 0) {
-                return design.drag[partName.indexOf('rightBearing')].drawX(x);
-              }
-            }
-            if (j >= 2 && sign*move.x < 0) {
-              return design.drag[partName.indexOf('rightBearing')].drawX(x);
-            }
-          }
-
           sign *= -1;
         }
+
+        // Default constraint motion if no specific conditions are met
         if (design.drag[partName.indexOf(part)].part) {
           return design.drag[partName.indexOf(part)].drawX(x); 
         }
