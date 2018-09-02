@@ -36,7 +36,15 @@ function updateBearingTable() {
 
   if (flag.warning) {
     for (let i = 0; i<count.length; i++) {
-      if (countSum < 6 ) {
+      if ((con.state[1] && con.state[2] && con.state[4] && con.state[7]) || (con.state[0] && con.state[3] && con.state[5] && con.state[6])) {
+        if (countSum > 4) {
+          warningBox('constraint', 'The system is over constrained.');
+        }
+        else {
+          warningBox('constraint', 'The system is constrained but susceptible to misalignment.', true);
+        }
+      }
+      else if (countSum < 6 ) {
         warningBox('constraint', 'The system is under constrained.');
       }
       else if (countSum > 6) {
@@ -69,76 +77,53 @@ function updateAssembly() {
   }
   else {
     if(con.tag[4] == 'shoulder' && con.tag[5] =='shoulder') {
-      warningBox('left', 'Bearings cannot be assembled with the left housing.');
+      warningBox('leftBearing', 'Bearings cannot be assembled with the left housing.');
     }
     if (con.tag[6] == 'shoulder' && con.tag[7] =='shoulder') {
-      warningBox('right', 'Bearings cannot be assembled with the right housing.');
+      warningBox('rightBearing', 'Bearings cannot be assembled with the right housing.');
     }
   }  
 }
 
 /* Appends warning boxes to the index page using JQuery */
-function warningBox(type, message) {
+function warningBox(part, message, amber) {
   let warning = $('<div class="round-box"><b>Warning: </b>' + message + '</div>').hide(0).delay(200).show(400);
-  warning.css('backgroundColor', '#ffcccc');
-  $(warning).addClass(type);
+  let warningName = ['shaft', 'leftBearing', 'rightBearing', 'merged'];
 
-  switch (type) {
-    case 'constraint': 
-      if (message != basic.message) {
-        basic.message = message;
-        $('.constraint').hide(400);
+  warning.css('backgroundColor', '#ffcccc');
+  if (amber) {
+    warning.css('backgroundColor', '#ffffcc');
+  }
+  $(warning).addClass(part);
+
+  if (part == 'constraint') {
+    if (message != basic.message) {
+      basic.message = message;
+      $('.constraint').hide(400);
+      $('#bearing-table').after(warning);
+    }
+  }
+  else {
+    for (let i=0; i<warningName.length; i++) {
+      if (part == warningName[i] && part != basic.assembly[i]) {
+        if (part == 'merged') {
+          $('.right').hide(400);
+          $('.left').hide(400);
+        }
+
         $('#bearing-table').after(warning);
+        basic.assembly[i] = part;
       }
-    break 
-    case 'shaft':
-      if (type != basic.assembly[0]) {
-        $('#bearing-table').after(warning);
-        basic.assembly[0] = type;
-      }
-    break
-    case 'merged':
-      if (type != basic.assembly[1]) {
-        $('.right').hide(400);
-        $('.left').hide(400);
-        $('#bearing-table').after(warning);
-        basic.assembly[1] = type;
-      }
-    break
-    case 'left':
-      if (type != basic.assembly[2]) {
-        $('#bearing-table').after(warning);
-        basic.assembly[2] = type;
-      }
-    break
-    case 'right':
-      if (type != basic.assembly[3]) {
-        $('#bearing-table').after(warning);
-        basic.assembly[3] = type;
-      }
-    break 
+    }
   }
 }
 
 /* Removes specified JQuery warning boxes */
-function removeWarning(type) {
-  if (type == 'all') {
+function removeWarning(part) {
+  if (part == 'all') {
     $('.round-box').hide(400);
   }
   else {
-    $('.' + type).hide(400);
+    $('.' + part).hide(400);
   }
 }
-
-/* ### THINGS TO WORK ON ###
-
-  # Improve the warningBox function:
-  Reduce reliance on switch and reduce repetition of code
-
-  # Improve the update functions:
-  Try to avoid using for loops with i, while reducing repetition of code
-
-  # Fix overall constraint warning:
-  Add more sophisticated cases for total number of constraints = 6
-
-*/
