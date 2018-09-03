@@ -482,6 +482,12 @@ function updateStyle() {
       design[typeName[i]][j].resetHighlight();
     }
   }
+
+  // Reset warnings
+  basic.message = undefined;
+  basic.assembly = [];
+  removeWarning('all');
+  flag.warning = true;
 }
 
 /* Updates bearing housing (merged or unmerged) */

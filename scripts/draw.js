@@ -128,12 +128,12 @@ function drawCollar(location, common, returnPosition) {
       x = [pos.offset.left - 20.5 - length/2, pos.offset.left + 20.5 + length/2,
            pos.offset.right - 20.5 - length/2, pos.offset.right + 20.5 + length/2];
 
-  x[location] = constraintLogic(x[location], 'shaft');
-
   if (common) {
     x[location] = pos.centre.x;
     length = canvas.dim.x * 0.5 - 41;
   }
+
+  x[location] = constraintLogic(x[location], 'shaft');
 
   if (returnPosition) {
     return {x: x[location], shift: 0, long: length, high: shaft.dia.straight + 26};
