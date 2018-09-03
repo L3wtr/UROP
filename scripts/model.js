@@ -176,20 +176,27 @@ class Drag {
     let hover = function() {},
         direction = function() {};
     let face = [false, false]; // Defines which sides of each part are constrained; [left, right]
+    let select = false;
 
     this.init = function() {
       switch (part) {
         case 'shaft':
           hover = function() {
             let isHovering = false; // Returns true if any of the hover conditions are met
+            if (select && mouseIsPressed) {
+              return true;
+            }
+            if (design.drag[1].part || design.drag[2].part) {
+              return false;
+            }
             if (basic.stepped) {
-              isHovering = checkHover({x: pos.centre.x + move.x, shift: -5, long: shaft.dim.x, high: shaft.dia.stepped}, true);
+              isHovering = checkHover({x: pos.centre.x + move.x, shift: 0, long: shaft.dim.x, high: shaft.dia.stepped}, true);
               if (!isHovering) {
-                isHovering = checkHover({x: pos.centre.x - canvas.dim.x * 0.1 - 12.5 + move.x, shift: -5, long: canvas.dim.x * 0.7 - 25, high: shaft.dia.straight}, true);
+                isHovering = checkHover({x: pos.centre.x - canvas.dim.x * 0.1 - 12.5 + move.x, shift: 0, long: canvas.dim.x * 0.7 - 25, high: shaft.dia.straight}, true);
               }            
             }
             else {
-              isHovering = checkHover({x: pos.centre.x + move.x, shift: -5, long: shaft.dim.x, high: shaft.dia.straight}, true);
+              isHovering = checkHover({x: pos.centre.x + move.x, shift: 0, long: shaft.dim.x, high: shaft.dia.straight}, true);
             }
             return isHovering;
           }
@@ -199,7 +206,13 @@ class Drag {
         break
         case 'leftBearing':
           hover = function() {
-            return checkHover({x: pos.offset.left + move.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true, true);
+            if (design.drag[0].part) {
+              return false;
+            }
+            if (select && mouseIsPressed) {
+              return true;
+            }
+            return checkHover({x: pos.offset.left + move.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true);
           }
           direction = function(x) {
             let sign = 1;
@@ -214,12 +227,16 @@ class Drag {
         break
         case 'rightBearing':
           hover = function() {
-            if (basic.stepped) {
-              return checkHover({x: pos.offset.right + move.x, shift: shaft.dia.straight/2 + 14, long: 50.5, high: 60}, true, true);
+            if (design.drag[0].part) {
+              return false;
             }
-            else {
-              return checkHover({x: pos.offset.right + move.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true, true);
-            } 
+            if (select && mouseIsPressed) {
+              return true;
+            }
+            if (basic.stepped) {
+              return checkHover({x: pos.offset.right + move.x, shift: shaft.dia.straight/2 + 14, long: 50.5, high: 60}, true);
+            }
+            return checkHover({x: pos.offset.right + move.x, shift: shaft.dia.straight/2 + 14, long: 42, high: 60}, true);
           }
           direction = function (x) {
             let sign = 1;
@@ -239,10 +256,12 @@ class Drag {
     this.selected = function() {
       if (hover()) {
         flag.hand = true;
+        select = true;
         this.part = true;
       }
       else {
         this.part = false;
+        select = false;
       }
     }
 
@@ -321,6 +340,7 @@ function setup() {
   flag = {
     held: false,
     hand: false,
+    press: false,
     motion: false, // Drag mode flag: if true, update move coordinates to allow drag motion
     alert: false, // Merge alert flag: if true, hide merge housing warning
     warning: true, // User warning flag: if true, update warning boxes
@@ -377,6 +397,9 @@ function draw() {
   // Mouse click and hover checks
   if (flag.held) {
     flag.held = false;
+  }
+  if (flag.press) {
+    flag.press = false;
   }
   if (flag.hand) {
     flag.hand = false;
@@ -495,27 +518,29 @@ function mousePressed() {
 function mouseDragged() {
   if (mode == 'test') {
     move.x = mouseX - move.origin;
+
+    for (let i=-1; i<=1; i+=2) {
+      if (i*move.x > shaft.dim.x*0.25) {
+        move.x = i*shaft.dim.x*0.25;
+      }
+    }
   }
 }
 
 /* Returns true if the mouse is within the position object parameters */
-function checkHover(position, pointer, inner) {
-  let margin = 5;
-  if (mouseX > position.x - position.long/2 - margin && mouseX < position.x + position.long/2 + margin &&
-        mouseY > pos.centre.y - position.shift - position.high/2 - margin &&
-          mouseY < pos.centre.y + position.shift + position.high/2 + margin) {
+function checkHover(position, pointer) {
+  let margin = 0;
+  if (mode == 'design') {
+    margin = 10;
+  }
+
+  if (((mouseY > pos.centre.y - position.shift - position.high/2 - margin && mouseY < pos.centre.y - position.shift + position.high/2 + margin) ||
+        (mouseY < pos.centre.y + position.shift + position.high/2 + margin && mouseY > pos.centre.y + position.shift - position.high/2 - margin)) &&
+          mouseX > position.x - position.long/2 - margin && mouseX < position.x + position.long/2 + margin) {
     if (!pointer) {
       flag.held = false;
     }
-    /*if (false) { // ### NEEDS WORK ###
-      if ((mouseY < pos.centre.y - position.shift + position.high/2 && mouseY > pos.centre.y - position.shift - position.high/2) ||
-            (mouseY > pos.centre.y + position.shift - position.high/2 && mouseY < pos.centre.y + position.shift + position.high/2) ) {
-        return true;
-      }
-    }
-    else {*/
-      return true;
-    //}
+    return true;
   }
 }
 
@@ -577,7 +602,7 @@ function constraintLogic(x, part, spacer) {
     if (design.drag[i].part) {
 
       // Spacer constraint logic
-      if (con.tag.indexOf('spacer')) {
+      if (con.tag.indexOf('spacer') > -1) {
         for (let k=-0.5; k<=0.5; k++) {
           if (k*move.x < 0) {
             if (design.drag[0].part) { // When shaft is selected
@@ -595,6 +620,12 @@ function constraintLogic(x, part, spacer) {
               if (con.state[-3*k + 1.5] && design.drag[-k + 1.5].drawX(x) != x) {
                 return design.drag[k + 1.5].drawX(x);
               }
+            }
+            if (design.drag[-k + 1.5].part && con.state[0] && con.state[3]) {
+              if (design.drag[-k + 1.5].drawX(x) != x) {
+                return design.drag[k + 1.5].drawX(x);
+              }
+              return design.drag[-k + 1.5].drawX(x);
             }
           }
         }
