@@ -271,14 +271,13 @@ class Drag {
   }
 }
 
-
 /* Setup function runs once on startup */
 function setup() {
   // Model dimensioning (to scale with screen width)
   canvas = {
     dim: {
       x: document.getElementById('model.ID').offsetWidth,
-      y: 350,
+      y: document.getElementById('model.ID').offsetHeight,
     },
   };
   canvas.dimensions = createCanvas(canvas.dim.x, canvas.dim.y);
