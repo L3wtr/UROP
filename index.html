@@ -19,7 +19,6 @@
   <!-- Local Scripts -->
   <script src="scripts/draw.js"></script>
   <script src="scripts/model.js"></script>
-
   <script src="scripts/table.js"></script>
 </head>
 
@@ -27,7 +26,6 @@
   <div class="container">
     <div class="row">
       <div class="two-thirds column">
-        <div id="model.ID"></div>
         <div id='myContainer'>
           <div class="switch-big">
             <input onclick="updateMode()" type="radio" id="design" name="mode.ID" value="design" checked/>
@@ -36,6 +34,27 @@
             <label for="test">Test Mode</label>
           </div>
         </div>
+
+        <input id="options" class="button-primary" type="button" value="Options">
+
+        <div id='modalBox' class='modal'>
+          <div class='modal-content'>
+            <span class="modal-close">&times;</span>
+            <h5>Options</h5>
+              Shaft type:
+              <div class="switch-small">
+                <input onclick="updateStyle()" type="radio" id="straight" name="shaft.ID" value="straight" checked/>
+                <label for="straight">Straight</label>
+                <input onclick="updateStyle()" type="radio" id="stepped" name="shaft.ID" value="stepped" />
+                <label for="stepped">Stepped</label>
+              </div> <br>
+              Merge bearing housings: <input id="housing" type="checkbox" onclick="updateHousing()"><br>
+          </div>
+        </div>
+
+        <input id="reset" class="button-primary" type="button" value="Reset" onclick="reset()">
+
+        <div id="model.ID" class='placeholder'></div>
 
         <div class="selection">
           <h5>Internal Constraints</h5>
@@ -47,21 +66,11 @@
             <input id="shoulder" value="Shoulder" type="button" onclick="feature('shoulder')">
             <input id="outSpacer" value="Spacer" type="button" onclick="feature('outSpacer')">
         </div>
-        <div class="options">
-          <h5>Options</h5>
-            Shaft type:
-            <div class="switch-small">
-              <input onclick="updateStyle()" type="radio" id="straight" name="shaft.ID" value="straight" checked/>
-              <label for="straight">Straight</label>
-              <input onclick="updateStyle()" type="radio" id="stepped" name="shaft.ID" value="stepped" />
-              <label for="stepped">Stepped</label>
-            </div> <br>
-            Merge bearing housings: <input id="housing" type="checkbox" onclick="updateHousing()"><br>
-          <input id="reset" class="button-primary" type="button" value="Reset" onclick="reset()">
-        </div>
       </div>
 
       <div class="one-third column">
+        <h5>System Parameters</h5>
+
         <table id="bearing-table">
           <tr>
             <td></td>
@@ -87,12 +96,12 @@
             <td id="rightExtCon"></td>
           </tr>
         </table>
-
       </div>
     </div>
   </div>
 
   <script src="https://rawgit.com/Imperial-visualizations/Physics-Visualizations/master/css/navigator.js"></script>
+  <script src="scripts/DOM.js"></script>
 </body>
 
 </html>

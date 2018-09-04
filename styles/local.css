@@ -14,19 +14,57 @@ input[type="button"].button-primary:focus {
   border-color: rgba(0, 62, 116, 1);; 
 }
 
-/* Modifying container padding */
+/* Modifying body and containers */
+body {
+  background-color: rgba(240,240,255,0.5);
+}
+
 .container {
-  padding-top: 7%;
+  margin: 2vw auto auto auto;
+}
+
+.two-thirds {
+  height: 83vh;
+  padding: 1vw;
+  margin: 0px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.one-third {
+  height: 83vh; 
+  padding: 1vw;
+  margin-left: 2vw;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.one-third h5 {
+  background-color: rgba(0, 62, 116, 0.9);
+  color: white;
+  text-align: center;
+  margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 .selection {
+  display: block;
   float: left;
-  margin-left: -260px;
-  padding-right: 15%;
+  margin: 0 5px 0 5px;
+  padding-top: 10px
 }
 
-.options {
-  float: left;
+#reset, #options {
+  margin-top: 8px;
+  left: calc(55vw - 80px);
+  position: absolute;
+  z-index: 1;
+}
+
+#options {
+  left: calc(55vw - 210px);
 }
 
 /* Fixing misalignment of navigation icon */
@@ -44,12 +82,19 @@ input[type="button"].button-primary:focus {
 
 /* Canvas styling */
 canvas {
-  border-radius: 12px;
+  border-radius: 5px;
+}
+
+.placeholder {
+  height: 350px;
+  border-radius: 5px;
+  background-color: rgb(240, 240, 255);
 }
 
 /* Modifying table style */
 #bearing-table {
   width: 100%;
+  font-size: 0.9em;
 }
 
 td {
@@ -63,21 +108,10 @@ td {
 }
 
 .round-box {
-  border-radius: 12px;
-  padding: 20px 20px 20px 20px;
-  margin: 20px 0px 20px 0px;
-}
-
-.overall {
-  display: block;
-  float: left;
-  font-size: 110%;
-}
-
-.warning {
-  display: inline-block;
-  padding-left: 2%;
-  font-size: 110%;
+  border-radius: 5px;
+  padding: 15px 10px 15px 10px;
+  margin: 12px 0px 12px 0px;
+  font-size: 0.8em;
 }
 
 /* Shaft type toggle button buttons */
@@ -143,9 +177,9 @@ td {
 
 /* Mode toggle button buttons */
 .switch-big {
-  position: relative;
-  float: left;
-  top: -402px;
+  margin-top: 5px;
+  position: absolute;
+  z-index: 1;
 }
 
 .switch-big label {
@@ -160,4 +194,45 @@ td {
   -ms-transition:     all 0.4s ease-in-out;
   -o-transition:      all 0.4s ease-in-out;
   transition:         all 0.4s ease-in-out;
+}
+
+/* Modal Popup */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5); 
+}
+
+.modal-content {
+  margin: 10% 30%;
+  padding: 20px;
+  z-index: 3;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+  animation-name: fade;
+  animation-duration: 1s;
+}
+
+.modal-close{
+  color: rgba(0, 0, 0, 0.5);
+  float: right;
+  font-size:30px;
+}
+
+.modal-close:hover, .modal-close:focus{
+  color: rgba(0, 0, 0, 0.9);
+  text-decoration: none;
+  cursor:pointer;
+}
+
+@keyframes fade{
+  from{opacity: 0}
+  to {opacity: 1}
 }

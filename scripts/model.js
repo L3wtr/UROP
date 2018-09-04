@@ -277,8 +277,8 @@ function setup() {
   // Model dimensioning (to scale with screen width)
   canvas = {
     dim: {
-      x: 0.95 * document.getElementById('model.ID').offsetWidth,
-      y: 400,
+      x: document.getElementById('model.ID').offsetWidth,
+      y: 350,
     },
   };
   canvas.dimensions = createCanvas(canvas.dim.x, canvas.dim.y);
@@ -296,7 +296,7 @@ function setup() {
   pos = {
     centre: {
       x: canvas.dim.x * 0.5,
-      y: canvas.dim.y * 0.5,
+      y: canvas.dim.y * 0.55,
     },
     offset: {
       up: canvas.dim.y * 0.5 - shaft.dia.straight - 20,
