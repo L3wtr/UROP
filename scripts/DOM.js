@@ -24,14 +24,18 @@ function outsideOptions(e) {
 /* Hides and shows selection buttons */
 var modeSelect = document.getElementsByClassName('switch-big')[0];
 var selection = document.getElementsByClassName('selection')[0];
+var placeholder = document.getElementsByClassName('placeholder')[0];
 
 modeSelect.addEventListener('click', modeSelection);
 
 function modeSelection() {
   if (mode == 'design') {
     selection.style.display = 'block';
+    placeholder.style.backgroundColor = '#ccd8f0'
   }
   else {
     selection.style.display = 'none';
+    placeholder.style.backgroundColor = '#f0f0ff'
+
   }
 }

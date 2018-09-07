@@ -364,10 +364,10 @@ function setup() {
 function draw() {
   // Base model
   if (mode == 'design') {
-    background(240, 240, 255);
+    background(204, 216, 240);
   }
   else {
-    background(230, 250, 250);
+    background(240, 240, 255);
   }
 
   for (let i=0; i<basic.layer.length; i++) {
@@ -417,10 +417,16 @@ function draw() {
 function reset() {
   design.run = [];
   design.runHighlight = [];
+  shaftModel = 'S0000';
+  shaftFile = shaftModel;
   for (let i =0; i<8; i++) {
     updateConstraint('empty', i);
   }
   updateStyle();
+
+  $("#graphic").fadeOut(200, function() {
+    $(this).attr("src","animations/background.gif").on('load', function(){$(this).fadeIn(200)});;
+  });
 
   // Reset warnings
   basic.message = undefined;
@@ -432,6 +438,11 @@ function reset() {
 /* Assigns constraint type */
 function feature(type) {
   design.runHighlight = [];
+
+  $("#graphic").fadeOut(200, function() {
+    $(this).attr("src","animations/" + type + ".gif").on('load', function(){$(this).fadeIn(200)});;
+  });
+
   switch (type) {
     case 'intCirclip':
       design.runHighlight = design.circlip.slice(4,8);
@@ -458,7 +469,11 @@ function feature(type) {
 function updateMode() {
   let modeCheck = document.querySelector('input[name="mode.ID"]:checked').value;
   mode = modeCheck;
-  design.runHighlight = []
+  design.runHighlight = [];
+
+  $("#graphic").fadeOut(250, function() {
+    $(this).fadeIn(250).attr("src","animations/background.gif");
+  });
 }
 
 /* Updates the chosen shaft style */
@@ -517,6 +532,20 @@ function mouseClicked() {
 /* p5 function that triggers when the mouse is pressed */
 function mousePressed() {
   move.origin = mouseX;
+
+  if (mode == 'test') {
+    let graphic = document.getElementById('graphic');
+    if ((design.drag[1].part || design.drag[2].part) && graphic.getAttribute('src') != 'animations/bearing.gif') {
+      $("#graphic").fadeOut(200, function() {
+        $(this).attr("src","animations/bearing.gif").on('load', function(){$(this).fadeIn(200)});
+      });
+    }
+    else if (design.drag[0].part && graphic.getAttribute('src') != 'animations/' + shaftFile + '.gif') {
+      $("#graphic").fadeOut(200, function() {
+        $(this).attr("src","animations/" + shaftFile + ".gif").on('load', function(){$(this).fadeIn(200)});
+      });
+    } 
+  }
 }
 
 /* p5 function that triggers when the mouse is dragged */
@@ -569,6 +598,24 @@ function updateConstraint(type, location) {
       con.state[i+1] = true;
     }
   });
+
+  // Custom prototype for replacing graphic path filenames
+  String.prototype.indexReplace = function (index) {
+    return this.substr(0, index) + '1' + this.substr(index + 1);
+  }
+
+  // Directing collar graphic paths
+  if (type == 'collar') {
+    shaftModel = shaftModel.indexReplace(location + 1);
+    shaftFile = shaftModel;
+
+    let mirror = ['0010', '0001', '0101', '0011', '1011', '0111'];
+    for (let i=0; i<mirror.length; i++) {
+      if (shaftModel.indexOf(mirror[i]) > -1) {
+        shaftFile = 'S' + shaftModel.substr(1).split('').reverse().join('');
+      }
+    }
+  }
 }
 
 /* Removes a constraint at a given location */ 

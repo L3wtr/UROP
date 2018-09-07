@@ -45,28 +45,48 @@ body {
   background-color: rgba(0, 62, 116, 0.9);
   color: white;
   text-align: center;
+  font-size: 3vh;
   margin-bottom: 10px;
-  border-radius: 5px;
+  border-radius: 3px;
 }
 
 .selection {
   display: block;
-  float: left;
-  margin-left: 30px;
+  position: absolute;
+  left: 28vh;
+  margin-left: 5vh;
+  margin-top: 1.5vh;
   padding-top: 10px
 }
 
-.animations {
+.selection h5 {
+  font-size: 3vh;
+  margin-bottom: 10px;
+}
+
+.selection input {
+  height: 5vh;
+  padding: 0 2vh 0 2vh;
+  font-size: 1.4vh;
+}
+
+.animations{
   float: left;
+  position: relative;
   border-radius: 5px;
-  padding-top: 10px;
+  padding-top: 1.5vh;
   height: 27.5vh;
+}
+
+#graphic {
+  position: absolute;
+  top: 1.5vh;
 }
 
 img {
   max-width: 100%;
   max-height: 100%;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
 
 #reset, #options {
@@ -100,8 +120,8 @@ canvas {
 
 .placeholder {
   height: 50vh;
-  border-radius: 5px;
-  background-color: rgb(240, 240, 255);
+  border-radius: 3px;
+  background-color: rgb(204, 216, 240);
 }
 
 /* Modifying table style */
@@ -121,7 +141,7 @@ td {
 }
 
 .round-box {
-  border-radius: 5px;
+  border-radius: 3px;
   padding: 15px;
   margin: 12px 0px 12px 0px;
   font-size: 1.7vh;
