@@ -422,6 +422,8 @@ function reset() {
   for (let i =0; i<8; i++) {
     updateConstraint('empty', i);
   }
+  document.getElementById('housing').checked = false;
+  updateHousing();
   updateStyle();
 
   $("#graphic").fadeOut(200, function() {
@@ -485,10 +487,25 @@ function updateStyle() {
     removeConstraint('spacer', [1, 2]);
     removeConstraint('all', 2);
     updateConstraint('collar', 2);
+
+    if (con.tag[0] == 'collar') {
+      shaftFile = 'ST1';
+    }
+    else {
+      shaftFile = 'ST0';
+    }
   }
   else {
     basic.stepped = false;
     updateConstraint('empty', 2)
+
+    if (con.tag[0] == 'collar') {
+      shaftModel = 'S1000';
+    }
+    else {
+      shaftModel = 'S0000';
+    }
+    shaftFile = shaftModel;
   }
   
   for (let i=0; i<typeName.length; i++) {
@@ -606,13 +623,23 @@ function updateConstraint(type, location) {
 
   // Directing collar graphic paths
   if (type == 'collar') {
-    shaftModel = shaftModel.indexReplace(location + 1);
-    shaftFile = shaftModel;
+    if (basic.stepped) {
+      if (location == 0) {
+        shaftFile = 'ST1';
+      }
+      else {
+        shaftFile = 'ST0';
+      }
+    }
+    else {
+      shaftModel = shaftModel.indexReplace(location + 1);
+      shaftFile = shaftModel;
 
-    let mirror = ['0010', '0001', '0101', '0011', '1011', '0111'];
-    for (let i=0; i<mirror.length; i++) {
-      if (shaftModel.indexOf(mirror[i]) > -1) {
-        shaftFile = 'S' + shaftModel.substr(1).split('').reverse().join('');
+      let mirror = ['0010', '0001', '0101', '0011', '1011', '0111'];
+      for (let i=0; i<mirror.length; i++) {
+        if (shaftModel.indexOf(mirror[i]) > -1) {
+          shaftFile = 'S' + shaftModel.substr(1).split('').reverse().join('');
+        }
       }
     }
   }

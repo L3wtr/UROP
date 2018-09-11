@@ -243,8 +243,9 @@ td {
 }
 
 .modal-content {
-  margin: 10% 30%;
+  margin: 10% 35%;
   padding: 20px;
+  text-align: center;
   z-index: 3;
   background-color: white;
   border-radius: 5px;
@@ -253,16 +254,31 @@ td {
   animation-duration: 1s;
 }
 
-.modal-close{
-  color: rgba(0, 0, 0, 0.5);
-  float: right;
-  font-size:30px;
+.close {
+  position: absolute;
+  right: 35.5%;
+  top: 21%;
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
 }
-
-.modal-close:hover, .modal-close:focus{
-  color: rgba(0, 0, 0, 0.9);
-  text-decoration: none;
+.close:hover {
+  opacity: 1;
   cursor:pointer;
+}
+.close:before, .close:after {
+  position: absolute;
+  left: 15px;
+  content: ' ';
+  height: 24px;
+  width: 2px;
+  background-color: rgba(0, 62, 116, 0.9);
+}
+.close:before {
+  transform: rotate(45deg);
+}
+.close:after {
+  transform: rotate(-45deg);
 }
 
 @keyframes fade{

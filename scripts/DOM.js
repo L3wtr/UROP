@@ -1,7 +1,7 @@
 /* Opens options modal */
 var modal = document.getElementById('modalBox');
 var open = document.getElementById('options');
-var close = document.getElementsByClassName('modal-close')[0];
+var close = document.getElementsByClassName('close')[0];
 
 open.addEventListener('click', openOptions);
 close.addEventListener('click', closeOptions);
