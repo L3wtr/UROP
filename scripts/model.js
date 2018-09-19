@@ -24,7 +24,7 @@ class Base {
         break
         case 'shaft':
           updateRender = function() {
-            drawShaft(pos.centre.x, basic.stepped);
+            drawShaft(pos.centre.x, basic.stepped, con.tag[0], con.tag[3]);
           }
         break
         case 'line':
@@ -140,6 +140,20 @@ class Constraint {
             return position = drawShoulder(location, basic.stepped, true);
           }
         break
+        case 'cap': 
+          updateRender = function() {
+            fill('white');
+            drawCap(location);
+          }
+          updatePreview = function() {
+            if (!(basic.stepped && location == 3)) {
+              drawCap(location);
+            }
+            return true;
+          }
+          updatePosition = function() {
+            return position = drawCap(location, true);;
+          }
       }
     }
     this.init();
@@ -323,7 +337,7 @@ function setup() {
 
   design = [];
   design.base = [], design.run = [];
-  typeName = ['circlip', 'collar', 'spacer', 'shoulder']; // Constraint types
+  typeName = ['circlip', 'collar', 'spacer', 'shoulder', 'cap']; // Constraint types
 
   for (let i=0; i<typeName.length; i++) {
     design[typeName[i]] = [];
@@ -464,6 +478,9 @@ function feature(type) {
     case 'shoulder':
       design.runHighlight = design.shoulder.slice(4,8);
     break
+    case 'cap':
+      design.runHighlight = design.cap.slice(0,1).concat(design.cap.slice(3,4));
+    break
   }
 }
 
@@ -485,6 +502,7 @@ function updateStyle() {
     basic.stepped = true;
     removeConstraint('collar', [1, 2, 3]);
     removeConstraint('spacer', [1, 2]);
+    removeConstraint('cap', 3);
     removeConstraint('all', 2);
     updateConstraint('collar', 2);
 
