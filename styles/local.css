@@ -50,7 +50,7 @@ body {
   border-radius: 3px;
 }
 
-.selection {
+.selection, .text-message {
   display: block;
   position: absolute;
   left: 28vh;
@@ -68,6 +68,24 @@ body {
   height: 5vh;
   padding: 0 2vh 0 2vh;
   font-size: 1.4vh;
+}
+
+.test-message {
+  display: none;
+  position: relative;
+  float: left;
+  word-wrap: break-word;
+  width: calc(100% - 33vh);
+  border-radius: 5px;
+  background-color: rgba(0, 62, 116, 0.9);
+  color: white;
+  margin-top: 1.5vh;
+  margin-left: 1.5vh;
+  padding: 2vh;
+}
+
+.test-message  h5 {
+  margin-bottom: -1.5vh;
 }
 
 .animations{

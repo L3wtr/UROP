@@ -490,6 +490,13 @@ function updateMode() {
   mode = modeCheck;
   design.runHighlight = [];
 
+  if (mode == 'test') {
+    $('.test-message').show(400);
+  }
+  else {
+    $('.test-message').hide(400);
+  }
+
   $("#graphic").fadeOut(250, function() {
     $(this).fadeIn(250).attr("src","animations/background.gif");
   });
