@@ -1,6 +1,6 @@
 # Bearing Constraints Visualisation
 
-Part of the Imperial Visualiations UROP. Learing tool to aid ME1 Design and Manufacture students understand the concept of shaft and bearing constraints, and to develop good engineering practice.
+Part of the Imperial Visualiations UROP. Learning tool to aid ME1 Design and Manufacture students understand the concept of shaft and bearing constraints, and to develop good engineering practice.
 
 ## Getting Started
 
