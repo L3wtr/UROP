@@ -491,10 +491,10 @@ function updateMode() {
   design.runHighlight = [];
 
   if (mode == 'test') {
-    $('.test-message').show(400);
+    $('.test-message').fadeIn(300);
   }
   else {
-    $('.test-message').hide(400);
+    $('.test-message').fadeOut(300);
   }
 
   $("#graphic").fadeOut(250, function() {

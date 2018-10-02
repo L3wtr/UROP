@@ -85,7 +85,6 @@ function drawShaft(x, stepped, leftCap, rightCap) {
   }
   else {
     rect(x + leftShort/2 - rightShort/2, pos.centre.y, shaft.dim.x - leftShort - rightShort, shaft.dia.straight, 3, 3, 3, 3);
-    console.log(shaft.dim.x)
   }
 }
 

@@ -84,21 +84,13 @@ body {
   padding: 2vh;
 }
 
-.test-message  h5 {
-  margin-bottom: -1.5vh;
-}
-
 .animations{
   float: left;
   position: relative;
   border-radius: 5px;
   padding-top: 1.5vh;
   height: 27.5vh;
-}
-
-#graphic {
-  position: absolute;
-  top: 1.5vh;
+  width: 27.5vh;
 }
 
 img {
@@ -138,7 +130,7 @@ canvas {
 
 .placeholder {
   height: 50vh;
-  border-radius: 3px;
+  border-radius: 5px;
   background-color: rgb(204, 216, 240);
 }
 

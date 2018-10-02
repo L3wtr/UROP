@@ -31,11 +31,10 @@ modeSelect.addEventListener('click', modeSelection);
 function modeSelection() {
   if (mode == 'design') {
     selection.style.display = 'block';
-    placeholder.style.backgroundColor = '#ccd8f0'
+    placeholder.style.backgroundColor = '#ccd8f0';
   }
   else {
     selection.style.display = 'none';
-    placeholder.style.backgroundColor = '#f0f0ff'
-
+    placeholder.style.backgroundColor = '#f0f0ff';
   }
 }
