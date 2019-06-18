@@ -2,10 +2,6 @@
 
 Part of the Imperial Visualiations UROP. Learning tool to aid ME1 Design and Manufacture students understand the concept of shaft and bearing constraints, and to develop good engineering practice.
 
-## Getting Started
-
-To run the visualisation, open the **index.html** file in a web browser (Chrome or Firefox are recommended). The visualisation can also be accessed through the Imperial Visualisations webpage.
-
 ## Future Improvements
 
 For those wishing to continue this project, a number of possible improvements for future versions may include:
